@@ -22,7 +22,7 @@ public class Ventana extends JFrame {
 
     public void paint(Graphics g) {
         super.paint(g);
-        lineaEcuacion(0,0,500,500);
+        lineaDDA(500,0,0,500);
     }
 
     public void lineaEcuacion(int x1, int y1, int x2, int y2){
@@ -34,4 +34,34 @@ public class Ventana extends JFrame {
         }
     }
 
+    public void lineaDDA(int x1, int y1, int x2, int y2){
+        float pendiente = Math.abs((float)(y2 - y1) / (x2 - x1));
+        
+        
+        if(y1>y2){
+            int temp=y2;
+            y2=y1;
+            y1=temp;
+        }
+        if(x1>x2){
+            int temp=x2;
+            x2=x1;
+            x1=temp;
+        }
+
+        if(pendiente>=1){
+            float x=x1;
+            for(int y=y1;y<=y2;y++){
+                x+=(1/pendiente);
+                putPixel(Math.round(x), y, Color.red);
+            }
+        }else{
+            float y=y1;
+            for(int x=x1;x<=x2;x++){
+                y+=pendiente;
+                putPixel(x, Math.round(y), Color.red);
+            }
+        }
+        //el analizador  diferenciador digital es un algoritmo de conversion de rastreo
+    }
 }

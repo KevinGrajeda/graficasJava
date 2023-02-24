@@ -1,3 +1,19 @@
+## Linea DDA
+el analizador  diferenciador digital es un algoritmo de conversion de rastreo que se basa en el calculo ya sea de dy o dx se fectua un muestreo de la linea en intervalos unitarios en una coordenada y se detreminan los valores enteros correspondientes mas proximos a la trayectoria de la linea  para la otra coordenada.
+
+## Pendientes positivas
+
+Para pendientes positivas ¡m es <= 1!, se hace muestreo en x en intervalos unitarios de forma que:
+
+#### dy=1 y dx=m 
+
+y se calcula cada valor sucesivo de y, 
+#### y<sub>k</sub>+1=y<sub>k</sub>+m 
+_Nota: ya que m puede ser cualquier numero real entre 0 y 1 los valores calculados de y deben redondearse al entero mas cercano._
+
+Para pendientes positivas **m > 1**, se revierten las formulas **dx** y **dy** osea se realiza un muestreo de **y** en intervalos unitarios de forma que: dy=1, dx=1/m y se calcula cada valor sucesivo de x como: x_k+1=x_k+(1/m)
+
+las ecuaciones se basan en la suposicion de que las lineas deben procesarse del extremo izquierdo al derecho, si este procedimiento se revierte entonces dx o dy serian -1
 ## Getting Started
 
 Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
@@ -17,54 +33,4 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 
 The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
 
-    public void lineaPrimera(int x1, int y1, int x2, int y2) {
-        float pendiente = (float)(y2 - y1) / (x2 - x1);
-        float y=y1;
-        for (int i = x1; i <= x2; i++) {
-        y+=pendiente;
-        putPixel(i, Math.round(y),Color.red);
-    }
-    void lineaPuntoMedio(int x1, int y1, int x2, int y2) {
-
-        int dx = x2 - x1;
-        int dy = y2 - y1;
-
-        int f = dy - (dx / 2);
-        int x = x1;
-        int y = y1;
-        pixel(x1, y1);
-        while (x <= x2) {
-            if (f > 0) {
-                y++;
-                f -= dx;
-            }
-            x++;
-            f += dy;
-            pixel(x, y);
-        }
-
-    }
-
-    void lineaBresenham(int x1, int y1, int x2, int y2) {
-        int deltaX = Math.abs(x2 - x1);
-        int deltaY = Math.abs(y2 - y1);
-        int sumaX = x1 < x2 ? 1 : -1;
-        int sumaY = y1 < y2 ? 1 : -1;
-        int error = deltaX - deltaY;
-
-        int x=x1;
-        int y=y1;
-        while(x != x2 || y != y2) {
-            pixel(x,y);
-            int error2 = error * 2;
-            if(error2 > -deltaY) {
-                error -= deltaY;
-                x += sumaX;
-            }
-            if(error2 < deltaX) {
-                error += deltaX;
-                y += sumaY;
-            }
-        }
-
-    }
+   
