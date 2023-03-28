@@ -22,22 +22,10 @@ public class Ventana extends JFrame {
 
     public void paint(Graphics g) {
         super.paint(g);
-        lineaEcuacion(250, 250, 500, 0);
-        lineaEcuacion(250, 250, 500, 125);
-        lineaEcuacion(250, 250, 500, 250);
-        lineaEcuacion(250, 250, 500, 375);
-        lineaEcuacion(250, 250, 500, 500);
-        lineaEcuacion(250, 250, 375, 500);
-        lineaDDA(250, 250, 250, 500);
-        lineaDDA(250, 250, 125, 500);
-        lineaDDA(250, 250, 0, 500);
-        lineaDDA(250, 250, 0, 375);
-        lineaDDA(250, 250, 0, 250);
-        lineaBresenham(250, 250, 0, 125);
-        lineaBresenham(250, 250, 0, 0);
-        lineaBresenham(250, 250, 375, 0);
-        lineaBresenham(250, 250, 250, 0);
-        lineaBresenham(250, 250, 125, 0);
+        //circulo(100, 100, 50);
+        //elipse(200, 200, 100, 170);
+        //rectangulo(100, 200, 20, 10);
+        circuloPuntoMedio(200,200,150);
     }
 
     public void lineaEcuacion(int x1, int y1, int x2, int y2) {
@@ -121,11 +109,136 @@ public class Ventana extends JFrame {
                 p += B;
             }
             if (avanzaY) {
-                putPixel(y, x, Color.green);
+                putPixel(y, x, Color.red);
             } else {
-                putPixel(x, y, Color.green);
+                putPixel(x, y, Color.red);
             }
         }
 
+    }
+
+    public void lineaPuntoMedio(int x1, int y1, int x2, int y2) {
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        boolean avanzaY = dy > dx;
+        if (avanzaY) {
+            int temp = x1;
+            x1 = y1;
+            y1 = temp;
+            temp = x2;
+            x2 = y2;
+            y2 = temp;
+        }
+        if (x1 > x2) {
+            int temp = x1;
+            x1 = x2;
+            x2 = temp;
+            temp = y1;
+            y1 = y2;
+            y2 = temp;
+        }
+        dx = x2 - x1;
+        dy = Math.abs(y2 - y1);
+
+        int p = dy - dx / 2;
+        int x = x1;
+        int y = y1;
+        int xFinal = x2;
+
+        int sumaY = y1 < y2 ? 1 : -1;
+        while (x < xFinal) {
+            x++;
+            if (p < 0) {
+                p += dy;
+            } else {
+                y+=sumaY;
+                p += dy - dx;
+            }
+            if (avanzaY) {
+                putPixel(y, x, Color.blue);
+            } else {
+                putPixel(x, y, Color.blue);
+            }
+        }
+    }
+
+    public void circulo(int xc, int yc, int r) {
+        for (int xPos = xc - r; xPos <= xc + r; xPos++) {
+            float yPos = (float) (yc + Math.sqrt(Math.pow(r, 2) - Math.pow(xPos - xc, 2)));
+            putPixel(xPos, Math.round(yPos), Color.blue);
+        }
+        for (int xPos = xc - r; xPos <= xc + r; xPos++) {
+            float yPos = (float) (yc - Math.sqrt(Math.pow(r, 2) - Math.pow(xPos - xc, 2)));
+            putPixel(xPos, Math.round(yPos), Color.blue);
+        }
+    }
+
+    public void circuloPolar(int xc, int yc, int r) {
+        for (float angulo = 0; angulo <= Math.PI / 2; angulo += 0.01) {
+            float xPos = (float) (xc + r * Math.sin(angulo));
+            float yPos = (float) (xc + r * Math.cos(angulo));
+            putPixel((int) xPos, (int) yPos, Color.red);
+        }
+        for (float angulo = (float) (Math.PI / 2); angulo <= Math.PI; angulo += 0.01) {
+            float xPos = (float) (xc + r * Math.sin(angulo));
+            float yPos = (float) (xc + r * Math.cos(angulo));
+            putPixel((int) xPos, (int) yPos, Color.red);
+        }
+        for (float angulo = (float) Math.PI; angulo <= Math.PI * (3 / 2); angulo += 0.01) {
+            float xPos = (float) (xc + r * Math.sin(angulo));
+            float yPos = (float) (xc + r * Math.cos(angulo));
+            putPixel((int) xPos, (int) yPos, Color.red);
+        }
+        for (float angulo = (float) (Math.PI * (3 / 2)); angulo <= 2 * Math.PI; angulo += 0.01) {
+            float xPos = (float) (xc + r * Math.sin(angulo));
+            float yPos = (float) (xc + r * Math.cos(angulo));
+            putPixel((int) xPos, (int) yPos, Color.red);
+        }
+
+    }
+
+    public void rectangulo(int x1, int y1, int x2, int y2) {
+        int ancho = Math.abs(x1 - x2);
+        int altura = Math.abs(y1 - y2);
+        int xInicio = Math.min(x1, x2);
+        int yInicio = Math.min(y1, y2);
+        lineaBresenham(xInicio, yInicio, xInicio + ancho, yInicio);
+        lineaBresenham(xInicio, yInicio, xInicio, yInicio + altura);
+        lineaBresenham(xInicio, yInicio + altura, xInicio + ancho, yInicio + altura);
+        lineaBresenham(xInicio + ancho, yInicio, xInicio + ancho, yInicio + altura);
+    }
+
+    public void elipse(int xc, int yc, int rx, int ry) {
+        for (float angulo = 0; angulo <= 2 * Math.PI; angulo += 0.005) {
+            float xPos = (float) (xc + rx * Math.sin(angulo));
+            float yPos = (float) (xc + ry * Math.cos(angulo));
+            putPixel((int) xPos, (int) yPos, Color.red);
+        }
+    }
+
+    public void circuloPuntoMedio(int xc, int yc, float R) {
+        putPixel(0, (int) R, Color.blue);
+        int xk = 0;
+        int yk = (int) R;
+        float pk = (float)(5/4) -R;
+        while (xk <= yk) {
+            xk += 1;
+            if (pk < 0) {
+                putPixel(xk+xc, yk+yc, Color.blue);
+                pk = pk + 2*xk + 3;
+            } else {
+                yk -= 1;
+                putPixel(xk+xc, yk+yc, Color.blue);
+                pk = pk + 2*xk - 2*yk + 5;
+            }
+            // simetria
+            putPixel(xk+xc, -yk+yc, Color.blue);
+            putPixel(-xk+xc, yk+yc, Color.blue);
+            putPixel(-xk+xc, -yk+yc, Color.blue);
+            putPixel(yk+xc, xk+yc, Color.blue);
+            putPixel(-yk+xc, xk+yc, Color.blue);
+            putPixel(yk+xc, -xk+yc, Color.blue);
+            putPixel(-yk+xc, -xk+yc, Color.blue);
+        }
     }
 }
