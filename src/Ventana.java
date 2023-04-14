@@ -1,9 +1,11 @@
-import javax.swing.JFrame;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.awt.*;
+import java.util.Stack;
 
 public class Ventana extends JFrame {
 
+    private BufferedImage image;
     private BufferedImage buffer;
     private Graphics graPixel;
 
@@ -11,21 +13,54 @@ public class Ventana extends JFrame {
         setTitle("ventana");
         setSize(500, 500);
         setLayout(null);
-        buffer = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
-        graPixel = (Graphics2D) buffer.createGraphics();
+        //buffer = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+        //graPixel = (Graphics2D) buffer.createGraphics();
+        image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
+
     }
 
-    public void putPixel(int x, int y, Color c) {
+    /*public void putPixel(int x, int y, Color c) {
         buffer.setRGB(0, 0, c.getRGB());
         this.getGraphics().drawImage(buffer, x, y, this);
+    }*/
+
+    int cont=0;
+    public void putPixel(int x, int y, Color color) {
+        image.setRGB(x, y, color.getRGB());
+//        cont++;
+//        if(cont%300==0) {
+//            this.getGraphics().drawImage(image, 0, 0, null);
+//        }
+//        this.getGraphics().drawImage(image, 0, 0, null);
+
+    }
+
+    public Color getPixel(int x, int y) {
+        return new Color(image.getRGB(x, y));
     }
 
     public void paint(Graphics g) {
         super.paint(g);
-        //circulo(100, 100, 50);
-        //elipse(200, 200, 100, 170);
-        //rectangulo(100, 200, 20, 10);
-        circuloPuntoMedio(200,200,150);
+        // tarea figuras
+        lineaBresenham(20,120,80,180);
+        lineaBresenham(100,150,160,150);
+        lineaBresenham(180,180,240,120);
+        lineaBresenham(340,150,260,150);
+
+        for(int i=0;i<4;i++){
+            circuloPuntoMedio(60,275,i*10+2);
+            putPixel(60+(3+i*8),275+(3+i*8),Color.black);
+            putPixel(60-(3+i*8),275-(3+i*8),Color.black);
+        }
+        rectangulo(115,250,215,300);
+        rectangulo(200,265,130,285);
+        for(int i=0;i<4;i++){
+            elipse(290,275,i*10+25,i*10+2);
+
+            putPixel(290+(27+i*9),275+(3+i*6),Color.black);
+            putPixel(290-(27+i*9),275-(3+i*6),Color.black);
+        }
+        g.drawImage(image, 0, 0, null);
     }
 
     public void lineaEcuacion(int x1, int y1, int x2, int y2) {
@@ -211,14 +246,14 @@ public class Ventana extends JFrame {
     public void elipse(int xc, int yc, int rx, int ry) {
         for (float angulo = 0; angulo <= 2 * Math.PI; angulo += 0.005) {
             float xPos = (float) (xc + rx * Math.sin(angulo));
-            float yPos = (float) (xc + ry * Math.cos(angulo));
+            float yPos = (float) (yc + ry * Math.cos(angulo));
             putPixel((int) xPos, (int) yPos, Color.red);
         }
     }
 
     public void circuloPuntoMedio(int xc, int yc, float R) {
         putPixel(0, (int) R, Color.blue);
-        int xk = 0;
+        int xk = -1;
         int yk = (int) R;
         float pk = (float)(5/4) -R;
         while (xk <= yk) {
@@ -241,4 +276,78 @@ public class Ventana extends JFrame {
             putPixel(-yk+xc, -xk+yc, Color.blue);
         }
     }
+
+    public void floodFill(int x, int y, Color colorRelleno) {
+        Color colorObjetivo = getPixel(x, y);
+
+        if (colorObjetivo.equals(colorRelleno)) {
+            return;
+        }
+
+        Stack<Point> pila = new Stack<>();
+        pila.push(new Point(x, y));
+
+        while (!pila.isEmpty()) {
+            Point p = pila.pop();
+            int xPos = p.x;
+            int yPos = p.y;
+            putPixel(xPos, yPos, colorRelleno);
+
+            if (xPos > 0 && getPixel(xPos - 1, yPos).equals(colorObjetivo)) {
+                pila.push(new Point(xPos - 1, yPos));
+            }
+            if (xPos < getWidth() - 1 && getPixel(xPos + 1, yPos).equals(colorObjetivo)) {
+                pila.push(new Point(xPos + 1, yPos));
+            }
+            if (yPos > 0 && getPixel(xPos, yPos - 1).equals(colorObjetivo)) {
+                pila.push(new Point(xPos, yPos - 1));
+            }
+            if (yPos < getHeight() - 1 && getPixel(xPos, yPos + 1).equals(colorObjetivo)) {
+                pila.push(new Point(xPos, yPos + 1));
+            }
+        }
+    }
+
+    public void scanLineFill(int x, int y, Color colorRelleno) {
+        Color colorObjetivo = getPixel(x, y);
+
+        if (!colorObjetivo.equals(colorRelleno)) {
+            Stack<Point> pila = new Stack<Point>();
+            pila.push(new Point(x, y));
+
+            while (!pila.empty()) {
+                Point p = pila.pop();
+
+                if (getPixel(p.x, p.y).equals(colorObjetivo)) {
+                    int xIzq = p.x;
+                    int xDer = p.x;
+
+                    while (xIzq >= 0 && getPixel(xIzq, p.y).equals(colorObjetivo)) {
+                        xIzq--;
+                    }
+
+                    while (xDer < getWidth() && getPixel(xDer, p.y).equals(colorObjetivo)) {
+                        xDer++;
+                    }
+
+                    for (int i = xIzq + 1; i < xDer; i++) {
+                        putPixel(i, p.y, colorRelleno);
+                    }
+
+                    for (int i = xIzq + 1; i < xDer; i++) {
+                        if (p.y > 0 && getPixel(i, p.y - 1).equals(colorObjetivo)) {
+                            pila.push(new Point(i, p.y - 1));
+                        }
+                    }
+
+                    for (int i = xIzq + 1; i < xDer; i++) {
+                        if (p.y < getHeight() - 1 && getPixel(i, p.y + 1).equals(colorObjetivo)) {
+                            pila.push(new Point(i, p.y + 1));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
