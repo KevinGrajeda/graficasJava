@@ -16,6 +16,10 @@ public class Ventana extends JFrame {
         //buffer = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
         //graPixel = (Graphics2D) buffer.createGraphics();
         image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = image.getGraphics();
+        g.setColor(new Color(250,250,250));
+        g.fillRect(0, 0, 500, 500);
+
 
     }
 
@@ -41,6 +45,11 @@ public class Ventana extends JFrame {
 
     public void paint(Graphics g) {
         super.paint(g);
+        rectangulo(20,50,300,300);
+        floodFill(30,60,Color.red);
+        //System.out.println((new Color(0,0,0,0)).equals(Color.black));
+
+        /*
         // tarea figuras
         lineaBresenham(20,120,80,180);
         lineaBresenham(100,150,160,150);
@@ -59,7 +68,7 @@ public class Ventana extends JFrame {
 
             putPixel(290+(27+i*9),275+(3+i*6),Color.black);
             putPixel(290-(27+i*9),275-(3+i*6),Color.black);
-        }
+        }*/
         g.drawImage(image, 0, 0, null);
     }
 
@@ -144,9 +153,9 @@ public class Ventana extends JFrame {
                 p += B;
             }
             if (avanzaY) {
-                putPixel(y, x, Color.red);
+                putPixel(y, x, Color.black);
             } else {
-                putPixel(x, y, Color.red);
+                putPixel(x, y, Color.black);
             }
         }
 
