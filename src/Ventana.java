@@ -17,7 +17,7 @@ public class Ventana extends JFrame {
         //graPixel = (Graphics2D) buffer.createGraphics();
         image = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
         Graphics g = image.getGraphics();
-        g.setColor(new Color(250,250,250));
+        g.setColor(new Color(250, 250, 250));
         g.fillRect(0, 0, 500, 500);
 
 
@@ -28,7 +28,8 @@ public class Ventana extends JFrame {
         this.getGraphics().drawImage(buffer, x, y, this);
     }*/
 
-    int cont=0;
+    int cont = 0;
+
     public void putPixel(int x, int y, Color color) {
         image.setRGB(x, y, color.getRGB());
 //        cont++;
@@ -45,31 +46,140 @@ public class Ventana extends JFrame {
 
     public void paint(Graphics g) {
         super.paint(g);
-        rectangulo(20,50,300,300);
-        floodFill(30,60,Color.red);
-        //System.out.println((new Color(0,0,0,0)).equals(Color.black));
 
-        /*
-        // tarea figuras
-        lineaBresenham(20,120,80,180);
-        lineaBresenham(100,150,160,150);
-        lineaBresenham(180,180,240,120);
-        lineaBresenham(340,150,260,150);
+//        elipse(200,400,50,30);
+//        floodFill(200,400,Color.red);
+//        circuloPuntoMedio(400,400,50);
+//        scanLineFill(400,400,Color.blue);
+//
+//
+//        // tarea figuras
+//        lineaPuntoMedio(20,120,80,180);
+//        lineaBresenham(100,150,160,150);
+//        lineaBresenham(180,180,240,120);
+//        lineaBresenham(340,150,260,150);
+//
+//        for(int i=0;i<4;i++){
+//            circuloPuntoMedio(60,275,i*10+2);
+//            putPixel(60+(3+i*8),275+(3+i*8),Color.black);
+//            putPixel(60-(3+i*8),275-(3+i*8),Color.black);
+//        }
+//        rectangulo(115,250,215,300);
+//        rectangulo(200,265,130,285);
+//        for(int i=0;i<4;i++){
+//            elipse(290,275,i*10+25,i*10+2);
+//
+//            putPixel(290+(27+i*9),275+(3+i*6),Color.black);
+//            putPixel(290-(27+i*9),275-(3+i*6),Color.black);
+//        }
 
-        for(int i=0;i<4;i++){
-            circuloPuntoMedio(60,275,i*10+2);
-            putPixel(60+(3+i*8),275+(3+i*8),Color.black);
-            putPixel(60-(3+i*8),275-(3+i*8),Color.black);
-        }
-        rectangulo(115,250,215,300);
-        rectangulo(200,265,130,285);
-        for(int i=0;i<4;i++){
-            elipse(290,275,i*10+25,i*10+2);
-
-            putPixel(290+(27+i*9),275+(3+i*6),Color.black);
-            putPixel(290-(27+i*9),275-(3+i*6),Color.black);
-        }*/
+//        curva1(50, 300, 60, 250, 8);
+//        curva1(250, 300, 60, 250, 100);
+//        curvaHumo(250, 250,10,30);
+//        curvaSol(100,350,4,4);
+//        curvaFlor(350,350,60,60);
+//        curvaParametrica1(250,250,4,4);
+//        curvaInfinito(250,250,200);
+        rectangulo(100,100,300,300);
+        malla(100,100,300,300);
         g.drawImage(image, 0, 0, null);
+    }
+
+    private void malla(int x1,int y1 , int x2, int y2) {
+        for(int x=x1;x<=x2;x+=10){
+            for(int y=y1;y<=y2;y+=10){
+                circuloPuntoMedio(x,y,1);
+            }
+        }
+        for(int x=x1;x<=x2;x+=10){
+            lineaBresenham(x,y1,x,y2);
+        }
+        for(int y=y1;y<=y2;y+=10){
+            lineaBresenham(x1,y,x2,y);
+        }
+    }
+
+
+    private void curva1(int x, int y, int ancho, int alto, int pasos) {
+        Point puntoAnterior = new Point(x, y - (int) (Math.sin(0) * 200));
+        for (float i = 0; i < Math.PI; i += Math.PI / pasos) {
+
+            Point puntoNuevo = new Point(x + (int) (i * ancho), y - (int) (Math.sin(i) * alto));
+            circuloPuntoMedio(puntoNuevo.x,puntoNuevo.y,2);
+            lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
+            puntoAnterior = puntoNuevo;
+        }
+    }
+
+    private void curvaHumo(int x, int y, int ancho, int alto) {
+        Point puntoAnterior = new Point(x + (int) (0 * Math.cos(4 * 0) * ancho), y - (int) (0 * alto));
+        for (float i = 0; i < 2 * Math.PI; i += Math.PI / 60) {
+
+
+            Point puntoNuevo = new Point(x + (int) (i * Math.cos(4 * i) * ancho), y - (int) (i * alto));
+
+            putPixel(puntoNuevo.x, puntoNuevo.y, Color.red);
+            lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
+            puntoAnterior = puntoNuevo;
+        }
+    }
+
+    private void curvaFlor(int xPos, int yPos, int ancho, int alto) {
+        Double xI=Math.cos(0)+(1.0/2)*Math.cos(7*0)+(1.0/3)*Math.sin(17*0);
+        Double yI=Math.sin(0)+(1.0/2)*Math.sin(7*0)+(1.0/3)*Math.cos(17*0);
+        Point puntoAnterior = new Point((int) (xPos+xI*ancho), (int) (yPos+yI*alto));
+        for (float i = 0; i < 2 * Math.PI; i += Math.PI / 150) {
+
+            Double x=Math.cos(i)+(1.0/2)*Math.cos(7*i)+(1.0/3)*Math.sin(17*i);
+            Double y=Math.sin(i)+(1.0/3)*Math.sin(7*i)+(1.0/3)*Math.cos(17*i);
+            Point puntoNuevo = new Point((int) (xPos+x*ancho), (int) (yPos+y*alto));
+
+            System.out.println(puntoNuevo.x + "," + puntoNuevo.y);
+            putPixel(puntoNuevo.x, puntoNuevo.y, Color.red);
+            lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
+            puntoAnterior = puntoNuevo;
+        }
+    }
+    private void curvaSol(int xPos, int yPos, int ancho, int alto) {
+        Point puntoAnterior=null;
+        for (float i = 0; i <= 14 * Math.PI; i += Math.PI / 100) {
+
+            Double x=17*Math.cos(i)+(7)*Math.cos((17.0/7)*i);
+            Double y=17*Math.sin(i)-(7)*Math.sin((17.0/7)*i);
+            Point puntoNuevo = new Point((int) (xPos+x*ancho), (int) (yPos+y*alto));
+
+            //putPixel(puntoNuevo.x, puntoNuevo.y, Color.red);
+            if(puntoAnterior!=null)
+                lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
+            puntoAnterior = puntoNuevo;
+        }
+    }
+    private void curvaParametrica1(int xPos, int yPos, int ancho, int alto) {
+        Point puntoAnterior=null;
+        for (float i = 0; i <= 14 * Math.PI; i += Math.PI / 100) {
+
+            Double x=i-3*Math.sin(i);
+            Double y=4-3*Math.cos(i);
+            Point puntoNuevo = new Point((int) (xPos+x*ancho), (int) (yPos+y*alto));
+
+            //putPixel(puntoNuevo.x, puntoNuevo.y, Color.red);
+            if(puntoAnterior!=null)
+                lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
+            puntoAnterior = puntoNuevo;
+        }
+    }
+    private void curvaInfinito(int xPos, int yPos, int ancho) {
+        Point puntoAnterior=null;
+        for (float i = 0; i <= 2* Math.PI; i += Math.PI / 100) {
+
+            Double x=ancho*Math.sin(i)/(1+Math.pow(Math.cos(i),2));
+            Double y=ancho*Math.sin(i)*Math.cos(i)/(1+Math.pow(Math.cos(i),2));
+            Point puntoNuevo = new Point((int) (xPos+x), (int) (yPos+y));
+            //putPixel(puntoNuevo.x, puntoNuevo.y, Color.red);
+            if(puntoAnterior!=null)
+                lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
+            puntoAnterior = puntoNuevo;
+        }
     }
 
     public void lineaEcuacion(int x1, int y1, int x2, int y2) {
@@ -195,7 +305,7 @@ public class Ventana extends JFrame {
             if (p < 0) {
                 p += dy;
             } else {
-                y+=sumaY;
+                y += sumaY;
                 p += dy - dx;
             }
             if (avanzaY) {
@@ -242,14 +352,18 @@ public class Ventana extends JFrame {
     }
 
     public void rectangulo(int x1, int y1, int x2, int y2) {
-        int ancho = Math.abs(x1 - x2);
-        int altura = Math.abs(y1 - y2);
-        int xInicio = Math.min(x1, x2);
-        int yInicio = Math.min(y1, y2);
-        lineaBresenham(xInicio, yInicio, xInicio + ancho, yInicio);
-        lineaBresenham(xInicio, yInicio, xInicio, yInicio + altura);
-        lineaBresenham(xInicio, yInicio + altura, xInicio + ancho, yInicio + altura);
-        lineaBresenham(xInicio + ancho, yInicio, xInicio + ancho, yInicio + altura);
+//        int ancho = Math.abs(x1 - x2);
+//        int altura = Math.abs(y1 - y2);
+//        int xInicio = Math.min(x1, x2);
+//        int yInicio = Math.min(y1, y2);
+//        lineaBresenham(xInicio, yInicio, xInicio + ancho, yInicio);
+//        lineaBresenham(xInicio, yInicio, xInicio, yInicio + altura);
+//        lineaBresenham(xInicio, yInicio + altura, xInicio + ancho, yInicio + altura);
+//        lineaBresenham(xInicio + ancho, yInicio, xInicio + ancho, yInicio + altura);
+        lineaBresenham(x1,y1,x2,y1);
+        lineaBresenham(x2,y1,x2,y2);
+        lineaBresenham(x2,y2,x1,y2);
+        lineaBresenham(x1,y2,x1,y1);
     }
 
     public void elipse(int xc, int yc, int rx, int ry) {
@@ -264,25 +378,25 @@ public class Ventana extends JFrame {
         putPixel(0, (int) R, Color.blue);
         int xk = -1;
         int yk = (int) R;
-        float pk = (float)(5/4) -R;
+        float pk = (float) (5 / 4) - R;
         while (xk <= yk) {
             xk += 1;
             if (pk < 0) {
-                putPixel(xk+xc, yk+yc, Color.blue);
-                pk = pk + 2*xk + 3;
+                putPixel(xk + xc, yk + yc, Color.blue);
+                pk = pk + 2 * xk + 3;
             } else {
                 yk -= 1;
-                putPixel(xk+xc, yk+yc, Color.blue);
-                pk = pk + 2*xk - 2*yk + 5;
+                putPixel(xk + xc, yk + yc, Color.blue);
+                pk = pk + 2 * xk - 2 * yk + 5;
             }
             // simetria
-            putPixel(xk+xc, -yk+yc, Color.blue);
-            putPixel(-xk+xc, yk+yc, Color.blue);
-            putPixel(-xk+xc, -yk+yc, Color.blue);
-            putPixel(yk+xc, xk+yc, Color.blue);
-            putPixel(-yk+xc, xk+yc, Color.blue);
-            putPixel(yk+xc, -xk+yc, Color.blue);
-            putPixel(-yk+xc, -xk+yc, Color.blue);
+            putPixel(xk + xc, -yk + yc, Color.blue);
+            putPixel(-xk + xc, yk + yc, Color.blue);
+            putPixel(-xk + xc, -yk + yc, Color.blue);
+            putPixel(yk + xc, xk + yc, Color.blue);
+            putPixel(-yk + xc, xk + yc, Color.blue);
+            putPixel(yk + xc, -xk + yc, Color.blue);
+            putPixel(-yk + xc, -xk + yc, Color.blue);
         }
     }
 
