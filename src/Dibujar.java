@@ -1,32 +1,61 @@
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Stack;
 
 public class Dibujar {
-    BufferedImage image;
-    int dx = 0, dy = 0;
-
+    private BufferedImage image;
+    private int dx = 0, dy = 0;
+    private float sx=1,sy=1;
+    private float theta =0;
+    private Color color=Color.red;
     public Dibujar(BufferedImage image) {
         this.image = image;
     }
-
-    public void putPixel(int x, int y, Color color) {
-        Point pixelDestino=calcularTraslacion(new Point(x,y));
-        image.setRGB(pixelDestino.x, pixelDestino.y, color.getRGB());
+    public void putPixel(int x, int y,Color color) {
+        if ((x < 0 || x >= image.getWidth()) || (y < 0 || y >= image.getHeight()))
+            return;
+        image.setRGB(x, y, color.getRGB());
+    }
+    public void putPixel(int x, int y) {
+        if ((x < 0 || x >= image.getWidth()) || (y < 0 || y >= image.getHeight()))
+            return;
+        image.setRGB(x, y, color.getRGB());
     }
 
     public Color getPixel(int x, int y) {
-        Point pixelDestino=calcularTraslacion(new Point(x,y));
-        return new Color(image.getRGB(pixelDestino.x, pixelDestino.y));
+        if((x<0||x>=image.getWidth())||(y<0||y>=image.getHeight()))
+            return null;
+        return new Color(image.getRGB(x, y));
     }
 
-    private Point calcularTraslacion(Point origen) {
-        int[][] matrizOrigen = {{
-                origen.x,
-                origen.y,
-                1
-        }};
-        int[][] matrizTransformacion = {
+    private Point2D.Float calcularEscalacion(Point2D.Float origen) {
+        float[][] matrizOrigen = {{origen.x, origen.y, 1}};
+        float[][] matrizTransformacion = {
+                {
+                        sx,
+                        0,
+                        0
+                },
+                {
+                        0,
+                        sy,
+                        0
+                },
+                {
+                        0,
+                        0,
+                        1
+                }
+        };
+
+        float[][] resultado = multiplicarMatriz(matrizOrigen, matrizTransformacion);
+        return new Point2D.Float((int) resultado[0][0], (int) resultado[0][1]);
+    }
+
+    private Point2D.Float calcularTraslacion(Point2D.Float origen) {
+        float[][] matrizOrigen = {{origen.x, origen.y, 1}};
+        float[][] matrizTransformacion = {
                 {
                         1,
                         0,
@@ -44,14 +73,41 @@ public class Dibujar {
                 }
         };
 
+        float[][] resultado = multiplicarMatriz(matrizOrigen, matrizTransformacion);
+        return new Point2D.Float(resultado[0][0], resultado[0][1]);
+    }
+    private Point2D.Float calularRotacion(Point2D.Float origen) {
+        float[][] matrizOrigen = {{origen.x, origen.y, 1}};
+        float[][] matrizTransformacion = {
+                {
+                        (float) Math.cos(theta),
+                        (float) Math.sin(theta),
+                        0
+                },
+                {
+                        (float) -Math.sin(theta),
+                        (float) Math.cos(theta),
+                        0
+                },
+                {
+                        0,
+                        0,
+                        1
+                }
+        };
 
-        int [][] resultado=multiplicarMatriz(matrizOrigen,matrizTransformacion);
-
-        return new Point(resultado[0][0], resultado[0][1]);
+        float[][] resultado = multiplicarMatriz(matrizOrigen, matrizTransformacion);
+        return new Point2D.Float(resultado[0][0], resultado[0][1]);
+    }
+    private Point calcularTransformaciones(Point puntoOrigen) {
+        Point2D.Float punto=new Point2D.Float(puntoOrigen.x, puntoOrigen.y);
+        Point2D.Float puntoDestino=calcularTraslacion(calcularEscalacion(calularRotacion(punto)));
+        return new Point((int) puntoDestino.x, (int) puntoDestino.y);
     }
 
-    private int[][] multiplicarMatriz(int[][] matrizOrigen, int[][] matrizTransformacion) {
-        int[][] resultado = new int[1][3];
+
+    private float[][] multiplicarMatriz(float[][] matrizOrigen, float[][] matrizTransformacion) {
+        float[][] resultado = new float[1][3];
         for (int i = 0; i < 1; i++) {
             for (int j = 0; j < 3; j++) {
                 for (int k = 0; k < 3; k++) {
@@ -62,22 +118,38 @@ public class Dibujar {
         return resultado;
     }
 
-    public void traslacion(int dxN, int dyN) {
-        dx = dxN;
-        dy = dyN;
+    public void traslacion(int dxNuevo, int dyNuevo) {
+        dx = dxNuevo;
+        dy = dyNuevo;
     }
+    public void escalacion(float sxNuevo, float syNuevo) {
+        sx = sxNuevo;
+        sy = syNuevo;
+    }
+    public void rotacion(float anguloNuevo) {
+        theta = anguloNuevo;
+    }
+    public void malla(int x1, int y1, int x2, int y2,int pasos) {
+        Point pos1=calcularTransformaciones(new Point(x1,y1));
+        Point pos2=calcularTransformaciones(new Point(x2,y2));
 
-    public void malla(int x1, int y1, int x2, int y2) {
-        for (int x = x1; x <= x2; x += 10) {
-            for (int y = y1; y <= y2; y += 10) {
-                circuloPuntoMedio(x, y, 1);
+        x1= pos1.x;
+        y1= pos1.y;
+
+        x2= pos2.x;
+        y2= pos2.y;
+
+        float tamPaso=(float)(x2-x1)/pasos;
+        for (float x = x1; x <= x2; x += tamPaso) {
+            for (float y = y1; y <= y2; y += 10) {
+                circuloPuntoMedio((int) x, (int)y, 1);
             }
         }
-        for (int x = x1; x <= x2; x += 10) {
-            lineaBresenham(x, y1, x, y2);
+        for (float x = x1; x <= x2; x += tamPaso) {
+            lineaBresenham((int)x, y1, (int)x, y2);
         }
-        for (int y = y1; y <= y2; y += 10) {
-            lineaBresenham(x1, y, x2, y);
+        for (float y = y1; y <= y2; y += tamPaso) {
+            lineaBresenham(x1, (int)y, x2, (int)y);
         }
     }
 
@@ -98,7 +170,7 @@ public class Dibujar {
 
             Point puntoNuevo = new Point(x + (int) (i * Math.cos(4 * i) * ancho), y - (int) (i * alto));
 
-            putPixel(puntoNuevo.x, puntoNuevo.y, Color.red);
+            putPixel(puntoNuevo.x, puntoNuevo.y);
             lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
             puntoAnterior = puntoNuevo;
         }
@@ -115,7 +187,7 @@ public class Dibujar {
             Point puntoNuevo = new Point((int) (xPos + x * ancho), (int) (yPos + y * alto));
 
             // System.out.println(puntoNuevo.x + "," + puntoNuevo.y);
-            // putPixel(puntoNuevo.x, puntoNuevo.y, Color.red);
+            // putPixel(puntoNuevo.x, puntoNuevo.y);
             lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
             puntoAnterior = puntoNuevo;
         }
@@ -129,7 +201,7 @@ public class Dibujar {
             Double y = 17 * Math.sin(i) - (7) * Math.sin((17.0 / 7) * i);
             Point puntoNuevo = new Point((int) (xPos + x * ancho), (int) (yPos + y * alto));
 
-            // putPixel(puntoNuevo.x, puntoNuevo.y, Color.red);
+            // putPixel(puntoNuevo.x, puntoNuevo.y);
             if (puntoAnterior != null)
                 lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
             puntoAnterior = puntoNuevo;
@@ -144,7 +216,7 @@ public class Dibujar {
             Double y = 4 - 3 * Math.cos(i);
             Point puntoNuevo = new Point((int) (xPos + x * ancho), (int) (yPos + y * alto));
 
-            // putPixel(puntoNuevo.x, puntoNuevo.y, Color.red);
+            // putPixel(puntoNuevo.x, puntoNuevo.y);
             if (puntoAnterior != null)
                 lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
             puntoAnterior = puntoNuevo;
@@ -158,14 +230,14 @@ public class Dibujar {
             Double x = ancho * Math.sin(i) / (1 + Math.pow(Math.cos(i), 2));
             Double y = ancho * Math.sin(i) * Math.cos(i) / (1 + Math.pow(Math.cos(i), 2));
             Point puntoNuevo = new Point((int) (xPos + x), (int) (yPos + y));
-            // putPixel(puntoNuevo.x, puntoNuevo.y, Color.red);
+            // putPixel(puntoNuevo.x, puntoNuevo.y);
             if (puntoAnterior != null)
                 lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
             puntoAnterior = puntoNuevo;
         }
     }
 
-    public void lineaEcuacion(int x1, int y1, int x2, int y2) {
+    private void lineaEcuacion(int x1, int y1, int x2, int y2) {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
         boolean avanzaY = dy > dx;
@@ -190,29 +262,42 @@ public class Dibujar {
         for (int x = x1; x <= x2; x++) {
             int y = (int) (pendiente * x + b);
             if (avanzaY) {
-                putPixel(y, x, Color.red);
+                putPixel(y, x);
             } else {
-                putPixel(x, y, Color.red);
+                putPixel(x, y);
             }
         }
     }
 
-    public void lineaDDA(int x1, int y1, int x2, int y2) {
+    private void lineaDDA(int x1, int y1, int x2, int y2) {
         int dx = x2 - x1;
         int dy = y2 - y1;
         int pasos = Math.max(Math.abs(dx), Math.abs(dy));
         float xInc = (float) dx / pasos;
         float yInc = (float) dy / pasos;
         float x = x1, y = y1;
-        putPixel(Math.round(x), Math.round(y), Color.green);
+        putPixel(Math.round(x), Math.round(y));
         for (int i = 0; i <= pasos; i++) {
             x += xInc;
             y += yInc;
-            putPixel(Math.round(x), Math.round(y), Color.green);
+            putPixel(Math.round(x), Math.round(y));
         }
     }
+    public void linea(int x1, int y1, int x2, int y2){
 
-    public void lineaBresenham(int x1, int y1, int x2, int y2) {
+        Point pos1=calcularTransformaciones(new Point(x1,y1));
+        Point pos2=calcularTransformaciones(new Point(x2,y2));
+
+        x1= pos1.x;
+        y1= pos1.y;
+
+        x2= pos2.x;
+        y2= pos2.y;
+        lineaPuntoMedio(x1,y1,x2,y2);
+    }
+
+
+    private void lineaBresenham(int x1, int y1, int x2, int y2) {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
         boolean avanzaY = dy > dx;
@@ -246,15 +331,15 @@ public class Dibujar {
                 p += B;
             }
             if (avanzaY) {
-                putPixel(y, x, Color.black);
+                putPixel(y, x);
             } else {
-                putPixel(x, y, Color.black);
+                putPixel(x, y);
             }
         }
 
     }
 
-    public void lineaPuntoMedio(int x1, int y1, int x2, int y2) {
+    private void lineaPuntoMedio(int x1, int y1, int x2, int y2) {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
         boolean avanzaY = dy > dx;
@@ -292,21 +377,21 @@ public class Dibujar {
                 p += dy - dx;
             }
             if (avanzaY) {
-                putPixel(y, x, Color.blue);
+                putPixel(y, x);
             } else {
-                putPixel(x, y, Color.blue);
+                putPixel(x, y);
             }
         }
     }
 
-    public void circulo(int xc, int yc, int r) {
+    public void circulo1(int xc, int yc, int r) {
         for (int xPos = xc - r; xPos <= xc + r; xPos++) {
             float yPos = (float) (yc + Math.sqrt(Math.pow(r, 2) - Math.pow(xPos - xc, 2)));
-            putPixel(xPos, Math.round(yPos), Color.blue);
+            putPixel(xPos, Math.round(yPos));
         }
         for (int xPos = xc - r; xPos <= xc + r; xPos++) {
             float yPos = (float) (yc - Math.sqrt(Math.pow(r, 2) - Math.pow(xPos - xc, 2)));
-            putPixel(xPos, Math.round(yPos), Color.blue);
+            putPixel(xPos, Math.round(yPos));
         }
     }
 
@@ -314,31 +399,34 @@ public class Dibujar {
         for (float angulo = 0; angulo <= Math.PI / 2; angulo += 0.01) {
             float xPos = (float) (xc + r * Math.sin(angulo));
             float yPos = (float) (xc + r * Math.cos(angulo));
-            putPixel((int) xPos, (int) yPos, Color.red);
+            putPixel((int) xPos, (int) yPos);
         }
         for (float angulo = (float) (Math.PI / 2); angulo <= Math.PI; angulo += 0.01) {
             float xPos = (float) (xc + r * Math.sin(angulo));
             float yPos = (float) (xc + r * Math.cos(angulo));
-            putPixel((int) xPos, (int) yPos, Color.red);
+            putPixel((int) xPos, (int) yPos);
         }
         for (float angulo = (float) Math.PI; angulo <= Math.PI * (3 / 2); angulo += 0.01) {
             float xPos = (float) (xc + r * Math.sin(angulo));
             float yPos = (float) (xc + r * Math.cos(angulo));
-            putPixel((int) xPos, (int) yPos, Color.red);
+            putPixel((int) xPos, (int) yPos);
         }
         for (float angulo = (float) (Math.PI * (3 / 2)); angulo <= 2 * Math.PI; angulo += 0.01) {
             float xPos = (float) (xc + r * Math.sin(angulo));
             float yPos = (float) (xc + r * Math.cos(angulo));
-            putPixel((int) xPos, (int) yPos, Color.red);
+            putPixel((int) xPos, (int) yPos);
         }
 
     }
 
     public void rectangulo(int x1, int y1, int x2, int y2) {
-        lineaBresenham(x1, y1, x2, y1);
-        lineaBresenham(x2, y1, x2, y2);
-        lineaBresenham(x2, y2, x1, y2);
-        lineaBresenham(x1, y2, x1, y1);
+
+
+
+        linea(x1, y1, x2, y1);
+        linea(x2, y1, x2, y2);
+        linea(x2, y2, x1, y2);
+        linea(x1, y2, x1, y1);
     }
 
     // int ancho = Math.abs(x1 - x2);
@@ -351,42 +439,71 @@ public class Dibujar {
     // lineaBresenham(xInicio + ancho, yInicio, xInicio + ancho, yInicio + altura);
 
     public void elipse(int xc, int yc, int rx, int ry) {
+
+        Point2D.Float centro=calularRotacion(new Point2D.Float(xc,yc));
+        xc= (int) centro.x;
+        yc= (int) centro.y;
+
+        int x1 = xc - rx;
+        int y1 = yc - ry;
+        int x2 = xc + rx;
+        int y2 = yc + ry;
+        Point2D.Float pos1=calcularTraslacion(calcularEscalacion(new Point2D.Float(x1,y1)));
+        Point2D.Float pos2=calcularTraslacion(calcularEscalacion(new Point2D.Float(x2,y2)));
+        x1= (int) pos1.x;
+        y1= (int)pos1.y;
+
+        x2=(int) pos2.x;
+        y2=(int) pos2.y;
+
+        xc = (x1 + x2) / 2;
+        yc = (y1 + y2) / 2;
+        rx = (x2 - x1) / 2;
+        ry = (y2 - y1) / 2;
+
+
         for (float angulo = 0; angulo <= 2 * Math.PI; angulo += 0.005) {
-            float xPos = (float) (xc + rx * Math.sin(angulo));
-            float yPos = (float) (yc + ry * Math.cos(angulo));
-            putPixel((int) xPos, (int) yPos, Color.red);
+            float xPos = (float) (xc + rx * Math.cos(theta) * Math.cos(angulo) - ry * Math.sin(theta) * Math.sin(angulo));
+            float yPos = (float) (yc + rx * Math.sin(theta) * Math.cos(angulo) + ry * Math.cos(theta) * Math.sin(angulo));
+
+            putPixel((int) xPos, (int) yPos);
         }
     }
 
     public void circuloPuntoMedio(int xc, int yc, float R) {
-        putPixel(0, (int) R, Color.blue);
+        putPixel(0, (int) R);
         int xk = -1;
         int yk = (int) R;
         float pk = (float) (5 / 4) - R;
         while (xk <= yk) {
             xk += 1;
             if (pk < 0) {
-                putPixel(xk + xc, yk + yc, Color.blue);
+                putPixel(xk + xc, yk + yc);
                 pk = pk + 2 * xk + 3;
             } else {
                 yk -= 1;
-                putPixel(xk + xc, yk + yc, Color.blue);
+                putPixel(xk + xc, yk + yc);
                 pk = pk + 2 * xk - 2 * yk + 5;
             }
             // simetria
-            putPixel(xk + xc, -yk + yc, Color.blue);
-            putPixel(-xk + xc, yk + yc, Color.blue);
-            putPixel(-xk + xc, -yk + yc, Color.blue);
-            putPixel(yk + xc, xk + yc, Color.blue);
-            putPixel(-yk + xc, xk + yc, Color.blue);
-            putPixel(yk + xc, -xk + yc, Color.blue);
-            putPixel(-yk + xc, -xk + yc, Color.blue);
+            putPixel(xk + xc, -yk + yc);
+            putPixel(-xk + xc, yk + yc);
+            putPixel(-xk + xc, -yk + yc);
+            putPixel(yk + xc, xk + yc);
+            putPixel(-yk + xc, xk + yc);
+            putPixel(yk + xc, -xk + yc);
+            putPixel(-yk + xc, -xk + yc);
         }
     }
 
     public void floodFill(int x, int y, Color colorRelleno) {
+        Point pos1=calcularTransformaciones(new Point(x,y));
+        x=pos1.x;
+        y=pos1.y;
         Color colorObjetivo = getPixel(x, y);
 
+        if((x<0||x>=image.getWidth())||(y<0||y>=image.getHeight()))
+            return;
         if (colorObjetivo.equals(colorRelleno)) {
             return;
         }
@@ -414,6 +531,7 @@ public class Dibujar {
             }
         }
     }
+
 
     public void scanLineFill(int x, int y, Color colorRelleno) {
         Color colorObjetivo = getPixel(x, y);

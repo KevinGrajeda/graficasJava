@@ -33,7 +33,7 @@ public class Ventana extends JFrame implements Runnable {
         while (true) {
             try {
                 repaint();
-                hilo.sleep(40);
+                hilo.sleep(20);
             } catch (InterruptedException ex) {
 
             }
@@ -46,9 +46,28 @@ public class Ventana extends JFrame implements Runnable {
 
         image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         Dibujar d=new Dibujar(image);
-        d.traslacion(cont, 10);
-        d.elipse(40, 250, 10, 30);
-//        d.floodFill(40,250,Color.red);
+        d.traslacion(cont*2,0);
+        d.escalacion(1,(float) (2+Math.sin(cont/10.0)));
+        d.rectangulo(30, 30, 50,50);
+        d.floodFill(40,40,Color.red);
+        d.elipse(50,60,6,10);
+        d.floodFill(50,60,Color.blue);
+
+        d.traslacion(100,250);
+        d.escalacion(1,1);
+        d.rotacion((float)cont/50);
+        d.rectangulo(20, 20, 60,60);
+
+        d.elipse(30,60,30,60);
+        d.rectangulo(0, 0, 70,70);
+
+        d.traslacion((int) (300+(100*Math.sin(cont/40.0))),250);
+        d.escalacion((float) (2+Math.sin(cont/10.0)),(float) (2+Math.sin(cont/10.0)));
+        d.rotacion((float)cont/30);
+        d.rectangulo(-20, -20, 20,20);
+        d.linea(-20,-20,20,20);
+        d.linea(-20,20,20,-20);
+
         buffer.getGraphics().drawImage(image,0,0,null);
         cont++;
         g.drawImage(buffer, 0, 0, this); //doble buffer
