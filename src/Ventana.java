@@ -46,20 +46,23 @@ public class Ventana extends JFrame implements Runnable {
 
         image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         Dibujar d=new Dibujar(image);
+
+        d.traslacion(40,40);
+        d.triangulo(0,0,40,0,20,30);
+
         d.traslacion(cont*2,0);
         d.escalacion(1,(float) (2+Math.sin(cont/10.0)));
         d.rectangulo(30, 30, 50,50);
-        d.floodFill(40,40,Color.red);
         d.elipse(50,60,6,10);
         d.floodFill(50,60,Color.blue);
 
         d.traslacion(100,250);
         d.escalacion(1,1);
-        d.rotacion((float)cont/50);
-        d.rectangulo(20, 20, 60,60);
+        d.rotacion((float) cont/30);
 
-        d.elipse(30,60,30,60);
         d.rectangulo(0, 0, 70,70);
+        d.elipse(30,30,10,15);
+        d.scanLineFill(35,65,Color.blue);
 
         d.traslacion((int) (300+(100*Math.sin(cont/40.0))),250);
         d.escalacion((float) (2+Math.sin(cont/10.0)),(float) (2+Math.sin(cont/10.0)));
@@ -67,6 +70,8 @@ public class Ventana extends JFrame implements Runnable {
         d.rectangulo(-20, -20, 20,20);
         d.linea(-20,-20,20,20);
         d.linea(-20,20,20,-20);
+        d.floodFill(-5,0,Color.yellow);
+        d.floodFill(5,0,Color.red);
 
         buffer.getGraphics().drawImage(image,0,0,null);
         cont++;

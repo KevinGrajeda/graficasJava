@@ -6,17 +6,20 @@ import java.util.Stack;
 public class Dibujar {
     private BufferedImage image;
     private int dx = 0, dy = 0;
-    private float sx=1,sy=1;
-    private float theta =0;
-    private Color color=Color.red;
+    private float sx = 1, sy = 1;
+    private float theta = 0;
+    private Color color = Color.red;
+
     public Dibujar(BufferedImage image) {
         this.image = image;
     }
-    public void putPixel(int x, int y,Color color) {
+
+    public void putPixel(int x, int y, Color color) {
         if ((x < 0 || x >= image.getWidth()) || (y < 0 || y >= image.getHeight()))
             return;
         image.setRGB(x, y, color.getRGB());
     }
+
     public void putPixel(int x, int y) {
         if ((x < 0 || x >= image.getWidth()) || (y < 0 || y >= image.getHeight()))
             return;
@@ -24,7 +27,7 @@ public class Dibujar {
     }
 
     public Color getPixel(int x, int y) {
-        if((x<0||x>=image.getWidth())||(y<0||y>=image.getHeight()))
+        if ((x < 0 || x >= image.getWidth()) || (y < 0 || y >= image.getHeight()))
             return null;
         return new Color(image.getRGB(x, y));
     }
@@ -76,6 +79,7 @@ public class Dibujar {
         float[][] resultado = multiplicarMatriz(matrizOrigen, matrizTransformacion);
         return new Point2D.Float(resultado[0][0], resultado[0][1]);
     }
+
     private Point2D.Float calularRotacion(Point2D.Float origen) {
         float[][] matrizOrigen = {{origen.x, origen.y, 1}};
         float[][] matrizTransformacion = {
@@ -99,9 +103,10 @@ public class Dibujar {
         float[][] resultado = multiplicarMatriz(matrizOrigen, matrizTransformacion);
         return new Point2D.Float(resultado[0][0], resultado[0][1]);
     }
+
     private Point calcularTransformaciones(Point puntoOrigen) {
-        Point2D.Float punto=new Point2D.Float(puntoOrigen.x, puntoOrigen.y);
-        Point2D.Float puntoDestino=calcularTraslacion(calcularEscalacion(calularRotacion(punto)));
+        Point2D.Float punto = new Point2D.Float(puntoOrigen.x, puntoOrigen.y);
+        Point2D.Float puntoDestino = calcularTraslacion(calcularEscalacion(calularRotacion(punto)));
         return new Point((int) puntoDestino.x, (int) puntoDestino.y);
     }
 
@@ -122,34 +127,37 @@ public class Dibujar {
         dx = dxNuevo;
         dy = dyNuevo;
     }
+
     public void escalacion(float sxNuevo, float syNuevo) {
         sx = sxNuevo;
         sy = syNuevo;
     }
+
     public void rotacion(float anguloNuevo) {
         theta = anguloNuevo;
     }
-    public void malla(int x1, int y1, int x2, int y2,int pasos) {
-        Point pos1=calcularTransformaciones(new Point(x1,y1));
-        Point pos2=calcularTransformaciones(new Point(x2,y2));
 
-        x1= pos1.x;
-        y1= pos1.y;
+    public void malla(int x1, int y1, int x2, int y2, int pasos) {
+        Point pos1 = calcularTransformaciones(new Point(x1, y1));
+        Point pos2 = calcularTransformaciones(new Point(x2, y2));
 
-        x2= pos2.x;
-        y2= pos2.y;
+        x1 = pos1.x;
+        y1 = pos1.y;
 
-        float tamPaso=(float)(x2-x1)/pasos;
+        x2 = pos2.x;
+        y2 = pos2.y;
+
+        float tamPaso = (float) (x2 - x1) / pasos;
         for (float x = x1; x <= x2; x += tamPaso) {
             for (float y = y1; y <= y2; y += 10) {
-                circuloPuntoMedio((int) x, (int)y, 1);
+                circuloPuntoMedio((int) x, (int) y, 1);
             }
         }
         for (float x = x1; x <= x2; x += tamPaso) {
-            lineaBresenham((int)x, y1, (int)x, y2);
+            lineaBresenham((int) x, y1, (int) x, y2);
         }
         for (float y = y1; y <= y2; y += tamPaso) {
-            lineaBresenham(x1, (int)y, x2, (int)y);
+            lineaBresenham(x1, (int) y, x2, (int) y);
         }
     }
 
@@ -283,17 +291,17 @@ public class Dibujar {
             putPixel(Math.round(x), Math.round(y));
         }
     }
-    public void linea(int x1, int y1, int x2, int y2){
 
-        Point pos1=calcularTransformaciones(new Point(x1,y1));
-        Point pos2=calcularTransformaciones(new Point(x2,y2));
+    public void linea(int x1, int y1, int x2, int y2) {
 
-        x1= pos1.x;
-        y1= pos1.y;
+        Point pos1 = calcularTransformaciones(new Point(x1, y1));
+        Point pos2 = calcularTransformaciones(new Point(x2, y2));
+        x1 = pos1.x;
+        y1 = pos1.y;
 
-        x2= pos2.x;
-        y2= pos2.y;
-        lineaPuntoMedio(x1,y1,x2,y2);
+        x2 = pos2.x;
+        y2 = pos2.y;
+        lineaPuntoMedio(x1, y1, x2, y2);
     }
 
 
@@ -343,7 +351,9 @@ public class Dibujar {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
         boolean avanzaY = dy > dx;
+
         if (avanzaY) {
+            // swap x and y
             int temp = x1;
             x1 = y1;
             y1 = temp;
@@ -351,7 +361,9 @@ public class Dibujar {
             x2 = y2;
             y2 = temp;
         }
+
         if (x1 > x2) {
+            // ensure x1 <= x2
             int temp = x1;
             x1 = x2;
             x2 = temp;
@@ -359,27 +371,27 @@ public class Dibujar {
             y1 = y2;
             y2 = temp;
         }
+
         dx = x2 - x1;
         dy = Math.abs(y2 - y1);
 
-        int p = dy - dx / 2;
-        int x = x1;
-        int y = y1;
-        int xFinal = x2;
 
-        int sumaY = y1 < y2 ? 1 : -1;
-        while (x < xFinal) {
-            x++;
-            if (p < 0) {
-                p += dy;
-            } else {
-                y += sumaY;
-                p += dy - dx;
-            }
+        int dosDy = 2 * dy;
+        int dosDymenosDx = 2 * (dy - dx);
+        int p = 2 * dy - dx;
+
+        int y = y1;
+        for (int x = x1; x <= x2; x++) {
             if (avanzaY) {
                 putPixel(y, x);
             } else {
                 putPixel(x, y);
+            }
+            if (p > 0) {
+                p += dosDymenosDx;
+                y += (y2 > y1 ? 1 : -1);
+            } else {
+                p += dosDy;
             }
         }
     }
@@ -422,11 +434,10 @@ public class Dibujar {
     public void rectangulo(int x1, int y1, int x2, int y2) {
 
 
-
-        linea(x1, y1, x2, y1);
-        linea(x2, y1, x2, y2);
-        linea(x2, y2, x1, y2);
-        linea(x1, y2, x1, y1);
+        linea(x1 , y1, x2 , y1);
+        linea(x2, y1 , x2, y2 );
+        linea(x2 , y2, x1 , y2);
+        linea(x1, y2 , x1, y1 );
     }
 
     // int ancho = Math.abs(x1 - x2);
@@ -440,21 +451,21 @@ public class Dibujar {
 
     public void elipse(int xc, int yc, int rx, int ry) {
 
-        Point2D.Float centro=calularRotacion(new Point2D.Float(xc,yc));
-        xc= (int) centro.x;
-        yc= (int) centro.y;
+        Point2D.Float centro = calularRotacion(new Point2D.Float(xc, yc));
+        xc = (int) centro.x;
+        yc = (int) centro.y;
 
         int x1 = xc - rx;
         int y1 = yc - ry;
         int x2 = xc + rx;
         int y2 = yc + ry;
-        Point2D.Float pos1=calcularTraslacion(calcularEscalacion(new Point2D.Float(x1,y1)));
-        Point2D.Float pos2=calcularTraslacion(calcularEscalacion(new Point2D.Float(x2,y2)));
-        x1= (int) pos1.x;
-        y1= (int)pos1.y;
+        Point2D.Float pos1 = calcularTraslacion(calcularEscalacion(new Point2D.Float(x1, y1)));
+        Point2D.Float pos2 = calcularTraslacion(calcularEscalacion(new Point2D.Float(x2, y2)));
+        x1 = (int) pos1.x;
+        y1 = (int) pos1.y;
 
-        x2=(int) pos2.x;
-        y2=(int) pos2.y;
+        x2 = (int) pos2.x;
+        y2 = (int) pos2.y;
 
         xc = (x1 + x2) / 2;
         yc = (y1 + y2) / 2;
@@ -497,12 +508,12 @@ public class Dibujar {
     }
 
     public void floodFill(int x, int y, Color colorRelleno) {
-        Point pos1=calcularTransformaciones(new Point(x,y));
-        x=pos1.x;
-        y=pos1.y;
+        Point pos1 = calcularTransformaciones(new Point(x, y));
+        x = pos1.x;
+        y = pos1.y;
         Color colorObjetivo = getPixel(x, y);
 
-        if((x<0||x>=image.getWidth())||(y<0||y>=image.getHeight()))
+        if ((x < 0 || x >= image.getWidth()) || (y < 0 || y >= image.getHeight()))
             return;
         if (colorObjetivo.equals(colorRelleno)) {
             return;
@@ -534,6 +545,9 @@ public class Dibujar {
 
 
     public void scanLineFill(int x, int y, Color colorRelleno) {
+        Point pos1 = calcularTransformaciones(new Point(x, y));
+        x = pos1.x;
+        y = pos1.y;
         Color colorObjetivo = getPixel(x, y);
 
         if (!colorObjetivo.equals(colorRelleno)) {
@@ -573,5 +587,11 @@ public class Dibujar {
                 }
             }
         }
+    }
+
+    public void triangulo(int x1, int y1, int x2, int y2, int x3, int y3) {
+        linea(x1,y1,x2,y2);
+        linea(x2,y2,x3,y3);
+        linea(x3,y3,x1,y1);
     }
 }
