@@ -1,3 +1,4 @@
+package aplicacion;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -8,7 +9,9 @@ public class Dibujar {
     private int dx = 0, dy = 0;
     private float sx = 1, sy = 1;
     private float theta = 0;
-    private Color color = Color.red;
+    public Color color = Color.red;
+
+    public int frameActual=0;
 
     public Dibujar(BufferedImage image) {
         this.image = image;
@@ -148,15 +151,15 @@ public class Dibujar {
         y2 = pos2.y;
 
         float tamPaso = (float) (x2 - x1) / pasos;
-        for (float x = x1; x <= x2; x += tamPaso) {
+        for (float x = x1; x <= x2; x += 10) {
             for (float y = y1; y <= y2; y += 10) {
                 circuloPuntoMedio((int) x, (int) y, 1);
             }
         }
-        for (float x = x1; x <= x2; x += tamPaso) {
+        for (float x = x1; x <= x2; x += 10) {
             lineaBresenham((int) x, y1, (int) x, y2);
         }
-        for (float y = y1; y <= y2; y += tamPaso) {
+        for (float y = y1; y <= y2; y += 10) {
             lineaBresenham(x1, (int) y, x2, (int) y);
         }
     }
@@ -245,7 +248,7 @@ public class Dibujar {
         }
     }
 
-    private void lineaEcuacion(int x1, int y1, int x2, int y2) {
+    public void lineaEcuacion(int x1, int y1, int x2, int y2) {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
         boolean avanzaY = dy > dx;
@@ -277,7 +280,7 @@ public class Dibujar {
         }
     }
 
-    private void lineaDDA(int x1, int y1, int x2, int y2) {
+    public void lineaDDA(int x1, int y1, int x2, int y2) {
         int dx = x2 - x1;
         int dy = y2 - y1;
         int pasos = Math.max(Math.abs(dx), Math.abs(dy));
@@ -305,7 +308,7 @@ public class Dibujar {
     }
 
 
-    private void lineaBresenham(int x1, int y1, int x2, int y2) {
+    public void lineaBresenham(int x1, int y1, int x2, int y2) {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
         boolean avanzaY = dy > dx;
@@ -347,13 +350,12 @@ public class Dibujar {
 
     }
 
-    private void lineaPuntoMedio(int x1, int y1, int x2, int y2) {
+    public void lineaPuntoMedio(int x1, int y1, int x2, int y2) {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
         boolean avanzaY = dy > dx;
 
         if (avanzaY) {
-            // swap x and y
             int temp = x1;
             x1 = y1;
             y1 = temp;
@@ -363,7 +365,6 @@ public class Dibujar {
         }
 
         if (x1 > x2) {
-            // ensure x1 <= x2
             int temp = x1;
             x1 = x2;
             x2 = temp;
@@ -593,5 +594,13 @@ public class Dibujar {
         linea(x1,y1,x2,y2);
         linea(x2,y2,x3,y3);
         linea(x3,y3,x1,y1);
+    }
+
+    public void cuadrado(int x,int y, int k) {
+        rectangulo(x,y,x+k,y+k);
+    }
+
+    public void animarTraslacion(int dx,int dy,int frameInicio,int fremeFinal) {
+
     }
 }
