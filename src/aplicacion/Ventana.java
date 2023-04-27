@@ -3,8 +3,6 @@ package aplicacion;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.awt.*;
-import java.util.Calendar;
-import java.util.Stack;
 
 public class Ventana extends JFrame implements Runnable {
 
@@ -12,6 +10,8 @@ public class Ventana extends JFrame implements Runnable {
     private BufferedImage fondo;
     // private Image buffer;
     private Thread hilo;
+    private int frameActual=0;
+    private Animador animador;
 
     public Ventana() {
         setTitle("ventana");
@@ -26,12 +26,14 @@ public class Ventana extends JFrame implements Runnable {
         g.setColor(new Color(250, 250, 250));
         g.fillRect(0, 0, 500, 500);
 
+        animador=new Animador();
         hilo = new Thread(this);
         hilo.start();
     }
 
     @Override
     public void run() {
+        animador.setInicioAplicacion(System.currentTimeMillis());
         while (true) {
             try {
                 repaint();
@@ -44,112 +46,42 @@ public class Ventana extends JFrame implements Runnable {
 
     int cont = 0;
 
-    // tarea figuras
-    // d.color=Color.black;
-    // d.lineaPuntoMedio(20, 120, 80, 180);
-    // d.lineaBresenham(100, 150, 160, 150);
-    // d.lineaBresenham(180, 180, 240, 120);
-    // d.lineaBresenham(340, 150, 260, 150);
-
-    // for (int i = 0; i < 4; i++) {
-    // d.circuloPuntoMedio(60, 275, i * 10 + 2);
-    // d.putPixel(60 + (3 + i * 8), 275 + (3 + i * 8), Color.black);
-    // d.putPixel(60 - (3 + i * 8), 275 - (3 + i * 8), Color.black);
-    // }
-    // d.rectangulo(115, 250, 215, 300);
-    // d.rectangulo(200, 265, 130, 285);
-    // for (int i = 0; i < 4; i++) {
-    // d.elipse(290, 275, i * 10 + 25, i * 10 + 2);
-    // d.putPixel(290 + (27 + i * 9), 275 + (3 + i * 6), Color.black);
-    // d.putPixel(290 - (27 + i * 9), 275 - (3 + i * 6), Color.black);
-    // }
-    // d.traslacion(cont*2,0);
-    // d.escalacion(1,(float) (2+Math.sin(cont/10.0)));
-    // d.rectangulo(30, 30, 50,50);
-    // d.elipse(50,60,6,10);
-    // d.floodFill(50,60,Color.blue);
-
-    // d.traslacion(100,250);
-    // d.escalacion(1,1);
-    // d.rotacion((float) cont/30);
-
-    // d.rectangulo(0, 0, 70,70);
-    // d.elipse(30,30,10,15);
-    // d.scanLineFill(35,65,Color.blue);
-
-    // d.traslacion((int) (300+(100*Math.sin(cont/40.0))),250);
-    // d.escalacion((float) (2+Math.sin(cont/10.0)),(float)
-    // (2+Math.sin(cont/10.0)));
-    // d.rotacion((float)cont/30);
-    // d.rectangulo(-20, -20, 20,20);
-    // d.linea(-20,-20,20,20);
-    // d.linea(-20,20,20,-20);
-    // d.floodFill(-5,0,Color.yellow);
-    // d.floodFill(5,0,Color.red);
-
     public void update(Graphics g) {
-        // g.drawImage(fondo,0,0,null);
-
         Image buffer = createImage(getWidth(), getHeight());
 
         image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         Dibujar d = new Dibujar(image);
 
-        // Primitivas
-        // d.rectangulo(150,120,175,170);
+        animador.setDibujar(d);
 
 
-        // //curvas parametricas
-        // d.curva1(50, 300, 60, 250, 8);
-        // d.curva1(250, 300, 60, 250, 100);
-        
-        // d.curvaHumo(200,300,20,40);
-        
-        // d.curvaParametrica1(250, 150, 4, 6);
-        
-        // d.curvaInfinito(250, 350, 200);
+        for(int i=0;i<400;i++){
+            long t=i*10;
+            animador.nuevaAnimacion();
+            animador.traslacion(20,250,0,0);
+            animador.traslacion(400,0,1000+t,1500+t);
+            animador.traslacion(-200,200,2500+t,3500+t);
+            animador.traslacion(-200,-200,4000+t,6500+t);
 
-        // d.curvaFlor(350, 350, 60, 60);
+            for(int j=0;j<100;j++){
+                long t2=j*350;
+                animador.escalacion(1,0.5,t2+t,t2+150+t);
+                animador.escalacion(-1,-0.5,t2+150+t,t2+300+t);
+            }
 
-        // d.curvaSol(200, 200, 4, 4);
+//            animador.rotacion(10,0+t,6000+t);
 
+            d.elipse(0,0,20,30);
+//            d.floodFill(1,-99,Color.blue);
+        }
 
-        // mallado
-        // d.malla(100, 100, 300, 300, 10);
-
-
-        // animaciones
-
-        // traslacion
-        d.traslacion(40+cont,40);
-        d.triangulo(0,0,40,0,20,30);
-        d.floodFill(10,10,Color.red);
-
-        // rotacion centro
-        // d.traslacion(300,250);
-        // d.rotacion((float)cont/30);
-        // d.rectangulo(-50, -50, 50,50);
-        // d.floodFill(-5,0,Color.yellow);
-
-        // rotacion punto
-        // d.traslacion(250, 250);
-        // d.rotacion((float)cont/20);
-        // d.rectangulo(180,0,220,30);
-        // d.floodFill(185,10,Color.yellow);
-
-        // escalacion
-        // d.traslacion(250,250);
-        // d.escalacion((float) (2+Math.sin(cont/10.0)),(float)(2+Math.sin(cont/10.0)));
-        // d.rectangulo(-20, -20, 20,20);
-
-
-
-        
         buffer.getGraphics().drawImage(image, 0, 0, null);
         cont++;
-        d.frameActual++;
+        frameActual++;
         g.drawImage(buffer, 0, 0, this); // doble buffer
     }
+
+
 
     public void paint(Graphics g) {
 
