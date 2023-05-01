@@ -286,8 +286,6 @@ public class Ventana extends JFrame implements Runnable {
         Dibujar d = new Dibujar(image);
 
         animador.setDibujar(d);
-
-        animador.tiempoActual *=4;
         // escena 1
         if (animador.tiempoActual > 0 && animador.tiempoActual <= 22000) {
 
@@ -320,7 +318,7 @@ public class Ventana extends JFrame implements Runnable {
             d.color = new Color(82, 82, 82);
             d.rectanguloRelleno(35, 0, 40, 10);
             d.color = new Color(220, 220, 220);
-            d.curvaHumo(280, 250, 5, 10, cont);
+            d.curvaHumo(280, 250, 5, 10, -cont);
 
             //botella
             animador.nuevaAnimacion();
@@ -352,21 +350,21 @@ public class Ventana extends JFrame implements Runnable {
 
         }
         // escena 2
-        if (animador.tiempoActual > 22000 && animador.tiempoActual <= 69000) {
+        if (animador.tiempoActual > 22000 && animador.tiempoActual <= 67000) {
             ojos=true;
-            animador.tiempoActual -=22000;
+            animador.tiempoActual -=20000;
 
             // nubes
             animador.nuevaAnimacion();
-            d.traslacion(-60, 40);
+            d.traslacion(50, 40);
             d.escalacion(1, 1);
-            animador.traslacion(600, 0, 0, 45000);
+            animador.traslacion(600, 0, 0, 75000);
             d.color = new Color(230, 230, 230);
             d.poligono(new int[]{-39, -34, -11, 41, 51, 54, 35, 14, 9, -2, -15, -30}, new int[]{3, 8, 10, 12, 5, -4, -17, -16, -10, -17, -19, -7});
             d.scanLineFill(22, 3);
 
             animador.nuevaAnimacion();
-            d.traslacion(600, 85);
+            d.traslacion(450, 85);
             d.escalacion(0.5, 1);
 
 //            for (int i = 0; i <= 25; i++) {
@@ -375,7 +373,7 @@ public class Ventana extends JFrame implements Runnable {
 //                animador.traslacion(-1500, 0, duracion, duracion2);
 //                animador.traslacion(1500, 0, duracion2, duracion2);
 //            }
-            animador.traslacion(-700, 0, 0, 60000);
+            animador.traslacion(-700, 0, 0, 80000);
             d.color = new Color(220, 220, 220);
             d.poligono(new int[]{-39, -34, -11, 41, 51, 54, 35, 14, 9, -2, -15, -30}, new int[]{3, 8, 10, 12, 5, -4, -17, -16, -10, -17, -19, -7});
             d.scanLineFill(22, 3);
@@ -383,7 +381,7 @@ public class Ventana extends JFrame implements Runnable {
             animador.nuevaAnimacion();
             d.traslacion(200, 60);
             d.escalacion(0.75, 0.3);
-            animador.traslacion(700, 0, 0, 50000);
+            animador.traslacion(700, 0, 0, 200000);
             d.color = new Color(225, 225, 225);
             d.poligono(new int[]{-39, -34, -11, 41, 51, 54, 35, 14, 9, -2, -15, -30}, new int[]{3, 8, 10, 12, 5, -4, -17, -16, -10, -17, -19, -7});
             d.scanLineFill(22, 3);
@@ -520,14 +518,56 @@ public class Ventana extends JFrame implements Runnable {
             buffer.getGraphics().drawImage(image, 0, 0, null);
         }
         // escena 3
-        if (animador.tiempoActual > 69000 && animador.tiempoActual <= 72000) {
+        if (animador.tiempoActual > 67000 && animador.tiempoActual <= 82000) {
+            animador.tiempoActual-=68000;
+
+            animador.nuevaAnimacion();
             d.color=new Color(20,20,20);
             d.rectanguloRelleno(0,0,500,450);
+            d.traslacion(250,300);
+
+            animador.traslacion(0,50,1000,1500);
+            animador.traslacion(0,-50,1500,2000);
+            animador.traslacion(0,50,2500,3000);
+            animador.traslacion(0,-50,3000,3500);
+            animador.traslacion(0,50,4000,4500);
+            animador.traslacion(0,-50,4500,5000);
+            animador.traslacion(0,50,5500,6500);
+            animador.traslacion(0,-50,6500,7500);
+            animador.traslacion(0,-50,7500,8500);
+
+            animador.escalacion(0.65,0.65,1000,1500);
+            animador.escalacion(-0.65,-0.65,1500,2000);
+            animador.escalacion(0.65,0.65,2500,3000);
+            animador.escalacion(-0.65,-0.65,3000,3500);
+            animador.escalacion(0.65,0.65,4000,4500);
+            animador.escalacion(-0.65,-0.65,4500,5000);
+            animador.escalacion(0.65,0.65,5500,6500);
+            animador.escalacion(-0.65,-0.65,6500,7500);
+            animador.escalacion(-0.65,-0.65,7500,8500);
+
+            if(animador.tiempoActual<9000) {
+                d.color = new Color(220, 60, 60);
+            }else{
+                d.color= new Color(54, 33, 23);
+            }
+            d.linea(0,0,-60,-86);
+            d.linea(-60,-86,60,-84);
+            d.linea(60,-84,0,0);
+            d.scanLineFill(0,-48);
+            d.elipse(-32, -108, 36, 35);
+            d.elipse(36, -108, 33, -35);
+
+            d.scanLineFill(-22,-104);
+            d.scanLineFill(29,-96);
+
+            d.rectanguloRelleno(-20,-108,20,-80);
+
             buffer.getGraphics().drawImage(image,0,0,null);
         }
         // escena 4
-        if (animador.tiempoActual > 72000 && animador.tiempoActual <= 92000 ) {
-            animador.tiempoActual-=72000;
+        if (animador.tiempoActual > 82000 && animador.tiempoActual <= 95000 ) {
+            animador.tiempoActual-=82000;
             ojos=true;
             animador.nuevaAnimacion();
             d.traslacion(250,280);
@@ -544,7 +584,7 @@ public class Ventana extends JFrame implements Runnable {
             buffer.getGraphics().drawImage(image,0,0,null);
         }
         // final
-        if (animador.tiempoActual > 92000) {
+        if (animador.tiempoActual > 95000) {
             d.color=new Color(220,220,220);
             d.rectanguloRelleno(0,0,500,450);
             buffer.getGraphics().drawImage(image,0,0,null);
