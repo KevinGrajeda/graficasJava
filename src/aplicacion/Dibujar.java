@@ -8,6 +8,7 @@ public class Dibujar {
     private BufferedImage image;
     private int dx = 0, dy = 0;
     private int dxAnimacion = 0, dyAnimacion = 0;
+    private double sxAnimacion = 0, syAnimacion = 0;
     private double sx = 1, sy = 1;
     private double theta = 0;
     public Color color = Color.red;
@@ -39,13 +40,13 @@ public class Dibujar {
         double[][] matrizOrigen = {{origen.x, origen.y, 1}};
         double[][] matrizTransformacion = {
                 {
-                        sx,
+                        sx*(sxAnimacion+1),
                         0,
                         0
                 },
                 {
                         0,
-                        sy,
+                        sy*(sxAnimacion+1),
                         0
                 },
                 {
@@ -176,6 +177,10 @@ public class Dibujar {
         sx = sxNuevo;
         sy = syNuevo;
     }
+    public void escalacionAnimacion(double sxNuevo, double syNuevo) {
+        sxAnimacion = sxNuevo;
+        syAnimacion = syNuevo;
+    }
 
     public void rotacion(double anguloNuevo) {
         theta = anguloNuevo;
@@ -216,11 +221,11 @@ public class Dibujar {
         }
     }
 
-    public void curvaHumo(int x, int y, int ancho, int alto) {
+    public void curvaHumo(int x, int y, int ancho, int alto,int paso) {
         CoordenadaInt puntoAnterior = new CoordenadaInt(x + (int) (0 * Math.cos(4 * 0) * ancho), y - (int) (0 * alto));
         for (double i = 0; i < 2 * Math.PI; i += Math.PI / 60) {
 
-            CoordenadaInt puntoNuevo = new CoordenadaInt(x + (int) (i * Math.cos(4 * i) * ancho), y - (int) (i * alto));
+            CoordenadaInt puntoNuevo = new CoordenadaInt(x + (int) (i * Math.cos(4 * i+(paso/10.0)) * ancho), y - (int) (i * alto));
 
             putPixel(puntoNuevo.x, puntoNuevo.y);
             lineaBresenham(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
@@ -655,10 +660,10 @@ public class Dibujar {
     }
 
     public void rectanguloRelleno(int x1, int y1, int x2, int y2) {
-        CoordenadaInt pos1 = calcularTraslacion(new CoordenadaInt(x1, y1));
-        CoordenadaInt pos2 = calcularTraslacion(new CoordenadaInt(x2, y2));
-        for (int y = pos1.y; y <= pos2.y; y++) {
-            for (int x = pos1.x; x <= pos2.x; x++) {
+        CoordenadaDouble pos1 = calcularTraslacion(calcularEscalacion(new CoordenadaDouble(x1, y1)));
+        CoordenadaDouble pos2 = calcularTraslacion(calcularEscalacion(new CoordenadaDouble(x2, y2)));
+        for (int y = (int) pos1.y; y <= pos2.y; y++) {
+            for (int x = (int) pos1.x; x <= pos2.x; x++) {
                 putPixel(x, y);
             }
         }
