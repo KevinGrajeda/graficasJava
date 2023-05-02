@@ -320,7 +320,7 @@ public class Ventana extends JFrame implements Runnable {
             d.color = new Color(220, 220, 220);
             d.curvaHumo(280, 250, 5, 10, -cont);
 
-            //botella
+            // botella
             animador.nuevaAnimacion();
             d.traslacion(60, 280);
             for (int i = 0; i < 10; i++) {
