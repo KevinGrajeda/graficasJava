@@ -884,10 +884,10 @@ public class Dibujar {
         }
         int x = (int) (punto.x + vector.x * u);
         int y = (int) (punto.y + vector.y * u);
-        return new Coordenada3D(x, y, 0);
+        return new Coordenada3D(x, y,0);
     }
 
-    public Coordenada3D proyectarPuntoUnPuntoFuga(Coordenada3DDouble punto ) {
+    public CoordenadaInt proyectarPuntoUnPuntoFuga(Coordenada3DDouble punto ) {
         double u;
         if ((punto.z - vectorProyeccion.z) == 0) {
             u = 0;
@@ -898,7 +898,7 @@ public class Dibujar {
 
         double y = (vectorProyeccion.y + ((double) punto.y - (double) vectorProyeccion.y) * u);
 
-        return new Coordenada3D((int) x, (int) y, 0);
+        return new CoordenadaInt((int) x, (int) y);
     }
 
     public void cuboUnPuntoFuga(int x, int y, int z, int ancho) {
@@ -918,7 +918,7 @@ public class Dibujar {
             puntos[i] = calcularTransformaciones3D(puntos[i]);
         }
 
-        Coordenada3D[] puntosFinales = new Coordenada3D[8];
+        CoordenadaInt[] puntosFinales = new CoordenadaInt[8];
         for (int i = 0; i < puntos.length; i++) {
             puntosFinales[i] = proyectarPuntoUnPuntoFuga(puntos[i]);
         }
@@ -950,7 +950,7 @@ public class Dibujar {
             puntos[i]=calcularTransformaciones3D(puntos[i]);
         }
 
-        Coordenada3D[] puntosFinales = new Coordenada3D[2];
+        CoordenadaInt[] puntosFinales = new CoordenadaInt[2];
         for (int i = 0; i < puntos.length; i++) {
             puntosFinales[i] = proyectarPuntoUnPuntoFuga(puntos[i]);
         }
@@ -963,20 +963,39 @@ public class Dibujar {
         punto = escalacion3D(punto);
         return punto;
     }
-/*
+
     public void curvaReloj(int xPos, int yPos,int zPos, int ancho) {
-        Coordenada3DDouble puntoAnterior = null;
+        CoordenadaInt[][] puntos = new CoordenadaInt[21][21];
+        int cordX=0;
+        int cordY=0;
         for (double t = 0; t <= 2 * Math.PI; t += Math.PI / 10) {
+            cordY=0;
             for (double r = 0; r <= 2 * Math.PI; r += Math.PI / 10) {
 
-                Double x = (2+Math.cos(t))*Math.cos(r);
-                Double y = (2+Math.cos(t))*Math.sin(r);
-                Double z = t;
-                Coordenada3DDouble puntoNuevo = new Coordenada3DDouble(x,y,z);
-                if (puntoAnterior != null)
-                    linea(puntoAnterior.x, puntoAnterior.y, puntoNuevo.x, puntoNuevo.y);
-                puntoAnterior = puntoNuevo;
+                double x = (2+Math.cos(t))*Math.cos(r);
+                double y = (2+Math.cos(t))*Math.sin(r);
+                double z = t;
+                Coordenada3DDouble punto3D = new Coordenada3DDouble(x,y,z);
+                punto3D=calcularTransformaciones3D(punto3D);
+                CoordenadaInt puntoNuevo=proyectarPuntoUnPuntoFuga(punto3D);
+                puntos[cordX][cordY]=puntoNuevo;
+                cordY++;
+            }
+            cordX++;
+        }
+        for(int x=0;x<21;x++){
+            for(int y=0;y<21;y++){
+                CoordenadaInt punto=puntos[x][y];
+
+                if(x!=20) {
+                    CoordenadaInt puntoDerecha = puntos[x + 1][y];
+                    linea(punto.x, punto.y, puntoDerecha.x, puntoDerecha.y);
+                }
+                if(y!=20) {
+                    CoordenadaInt puntoArriba = puntos[x][y + 1];
+                    linea(punto.x, punto.y, puntoArriba.x, puntoArriba.y);
+                }
             }
         }
-    }*/
+    }
 }
