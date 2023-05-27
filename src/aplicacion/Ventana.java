@@ -6,16 +6,9 @@ import java.awt.*;
 
 public class Ventana extends JFrame implements Runnable {
 
-    private BufferedImage fondo;
-    private BufferedImage edificios;
-    private BufferedImage arboles;
-    private BufferedImage cantina;
-    private BufferedImage cementerio;
-
     // private Image buffer;
     private Thread hilo;
     private Animador animador;
-    private boolean ojos=false;
 
     public Ventana() {
         setTitle("Si manejas no tomes");
@@ -61,9 +54,52 @@ public class Ventana extends JFrame implements Runnable {
         animador.setDibujar(d);
 
 
-        animador.nuevaAnimacion();
-        d.traslacion(250,100);
-        d.tetris(0,0,0,100,(double)cont/100);
+        // CUBOS PUNTOS FUGA
+        int x = MouseInfo.getPointerInfo().getLocation().x;
+        int y = MouseInfo.getPointerInfo().getLocation().y;
+        //System.out.println(x+","+y);
+
+        // un punto de fuga
+        d.traslacion(125,297);
+        d.setVectorProyeccion(new Coordenada3D(75,-70,150));
+        d.setVectorRotacion(0,0,0);
+        d.color=new Color(200,0,200);
+        d.linea3D(0,0,0,70,0,0);
+        d.linea3D(0,0,0,0,-70,0);
+        d.linea3D(0,0,0,0,0,70);
+
+        d.color=new Color(200,0,0);;
+        d.cuboUnPuntoFuga(25,-25,25,50);
+
+
+        // dos puntos de fuga
+        d.traslacion(250,148);
+        d.setVectorProyeccion(new Coordenada3D(0,-60,131));
+        d.setVectorRotacion(0,0.57,0);
+        d.color=new Color(200,0,200);
+        d.linea3D(0,0,0,70,0,0);
+        d.linea3D(0,0,0,0,-70,0);
+        d.linea3D(0,0,0,0,0,70);
+
+        d.color=new Color(200,0,0);;
+        d.cuboUnPuntoFuga(25,-25,25,50);
+
+
+
+        // tres puntos de fuga
+        d.traslacion(375,297);
+        d.setVectorProyeccion(new Coordenada3D(0,0,111));
+        d.setVectorRotacion(.69,.78,0);
+        d.color=new Color(200,0,200);
+        d.linea3D(0,0,0,70,0,0);
+        d.linea3D(0,0,0,0,-70,0);
+        d.linea3D(0,0,0,0,0,70);
+
+        d.color=new Color(200,0,0);;
+        d.cuboUnPuntoFuga(25,-25,25,50);
+
+
+
 
 
 
