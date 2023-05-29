@@ -840,10 +840,12 @@ public class Dibujar {
             puntos[i] = new Coordenada3D((int) rotatedX, punto.y, (int) rotatedZ);
         }
 
+
         for (int i = 0; i < puntos.length; i++) {
             puntos[i] = proyectarPunto(puntos[i], vector);
         }
 
+        
 
         linea(puntos[0].x, puntos[0].y, puntos[1].x, puntos[1].y);
         linea(puntos[1].x, puntos[1].y, puntos[2].x, puntos[2].y);
@@ -918,7 +920,8 @@ public class Dibujar {
             puntos[i] = calcularTransformaciones3D(puntos[i]);
         }
 
-        CoordenadaInt[] puntosFinales = new CoordenadaInt[8];
+
+        CoordenadaInt[] puntosFinales = new CoordenadaInt[14];
         for (int i = 0; i < puntos.length; i++) {
             puntosFinales[i] = proyectarPuntoUnPuntoFuga(puntos[i]);
         }
@@ -939,6 +942,117 @@ public class Dibujar {
         linea(puntosFinales[1].x, puntosFinales[1].y, puntosFinales[5].x, puntosFinales[5].y);
         linea(puntosFinales[2].x, puntosFinales[2].y, puntosFinales[6].x, puntosFinales[6].y);
         linea(puntosFinales[3].x, puntosFinales[3].y, puntosFinales[7].x, puntosFinales[7].y);
+
+    }
+
+    public void cuboUnPuntoFill(int x, int y, int z, int ancho) {
+
+        Coordenada3DDouble[] puntos = new Coordenada3DDouble[14];
+
+        puntos[0] = new Coordenada3DDouble(x - ancho / 2, y - ancho / 2, z - ancho / 2);
+        puntos[1] = new Coordenada3DDouble(x + ancho / 2, y - ancho / 2, z - ancho / 2);
+        puntos[2] = new Coordenada3DDouble(x + ancho / 2, y + ancho / 2, z - ancho / 2);
+        puntos[3] = new Coordenada3DDouble(x - ancho / 2, y + ancho / 2, z - ancho / 2);
+        puntos[4] = new Coordenada3DDouble(x - ancho / 2, y - ancho / 2, z + ancho / 2);
+        puntos[5] = new Coordenada3DDouble(x + ancho / 2, y - ancho / 2, z + ancho / 2);
+        puntos[6] = new Coordenada3DDouble(x + ancho / 2, y + ancho / 2, z + ancho / 2);
+        puntos[7] = new Coordenada3DDouble(x - ancho / 2, y + ancho / 2, z + ancho / 2);
+
+        puntos[8] = new Coordenada3DDouble(x - ancho / 2, 0,0);
+        puntos[9] = new Coordenada3DDouble(0, 0, z - ancho / 2);
+        puntos[10] = new Coordenada3DDouble(0, y - ancho / 2, 0);
+
+        puntos[11] = new Coordenada3DDouble(x + ancho / 2, 0,0);
+        puntos[12] = new Coordenada3DDouble(0, 0, z + ancho / 2);
+        puntos[13] = new Coordenada3DDouble(0, y + ancho / 2, 0);
+
+        for (int i = 0; i < puntos.length; i++) {
+            puntos[i] = calcularTransformaciones3D(puntos[i]);
+        }
+
+
+        double zMenor=Double.MAX_VALUE;
+        int indexMenor=-1;
+        for (int i = 0; i < 14; i++) {
+            if(puntos[i].z<zMenor){
+                zMenor=puntos[i].z;
+                indexMenor=i;
+            }
+        }
+        puntos[indexMenor]=null;
+
+        CoordenadaInt[] puntosFinales = new CoordenadaInt[14];
+        for (int i = 0; i < 14; i++) {
+            if(indexMenor!=i)
+                puntosFinales[i] = proyectarPuntoUnPuntoFuga(puntos[i]);
+        }
+
+
+        color=Color.ORANGE;
+        // Dibujar las aristas
+        if(!(puntos[0]==null||puntos[1]==null))
+            linea(puntosFinales[0].x, puntosFinales[0].y, puntosFinales[1].x, puntosFinales[1].y);
+        if(!(puntos[1]==null||puntos[2]==null))
+            linea(puntosFinales[1].x, puntosFinales[1].y, puntosFinales[2].x, puntosFinales[2].y);
+        if(!(puntos[2]==null||puntos[3]==null))
+            linea(puntosFinales[2].x, puntosFinales[2].y, puntosFinales[3].x, puntosFinales[3].y);
+        if(!(puntos[3]==null||puntos[0]==null))
+            linea(puntosFinales[3].x, puntosFinales[3].y, puntosFinales[0].x, puntosFinales[0].y);
+
+        if(!(puntos[4]==null||puntos[5]==null))
+            linea(puntosFinales[4].x, puntosFinales[4].y, puntosFinales[5].x, puntosFinales[5].y);
+        if(!(puntos[5]==null||puntos[6]==null))
+            linea(puntosFinales[5].x, puntosFinales[5].y, puntosFinales[6].x, puntosFinales[6].y);
+        if(!(puntos[6]==null||puntos[7]==null))
+            linea(puntosFinales[6].x, puntosFinales[6].y, puntosFinales[7].x, puntosFinales[7].y);
+        if(!(puntos[7]==null||puntos[4]==null))
+            linea(puntosFinales[7].x, puntosFinales[7].y, puntosFinales[4].x, puntosFinales[4].y);
+
+        if(!(puntos[0]==null||puntos[4]==null))
+            linea(puntosFinales[0].x, puntosFinales[0].y, puntosFinales[4].x, puntosFinales[4].y);
+        if(!(puntos[1]==null||puntos[5]==null))
+            linea(puntosFinales[1].x, puntosFinales[1].y, puntosFinales[5].x, puntosFinales[5].y);
+        if(!(puntos[2]==null||puntos[6]==null))
+            linea(puntosFinales[2].x, puntosFinales[2].y, puntosFinales[6].x, puntosFinales[6].y);
+        if(!(puntos[3]==null||puntos[7]==null))
+            linea(puntosFinales[3].x, puntosFinales[3].y, puntosFinales[7].x, puntosFinales[7].y);
+
+        color=Color.ORANGE;
+        floodFill(puntosFinales[8].x,puntosFinales[8].y,color);
+        floodFill(puntosFinales[9].x,puntosFinales[9].y,color);
+        floodFill(puntosFinales[10].x,puntosFinales[10].y,color);
+        floodFill(puntosFinales[11].x,puntosFinales[11].y,color);
+        floodFill(puntosFinales[12].x,puntosFinales[12].y,color);
+        floodFill(puntosFinales[13].x,puntosFinales[13].y,color);
+
+
+        color=Color.RED;
+        if(!(puntos[0]==null||puntos[1]==null))
+            linea(puntosFinales[0].x, puntosFinales[0].y, puntosFinales[1].x, puntosFinales[1].y);
+        if(!(puntos[1]==null||puntos[2]==null))
+            linea(puntosFinales[1].x, puntosFinales[1].y, puntosFinales[2].x, puntosFinales[2].y);
+        if(!(puntos[2]==null||puntos[3]==null))
+            linea(puntosFinales[2].x, puntosFinales[2].y, puntosFinales[3].x, puntosFinales[3].y);
+        if(!(puntos[3]==null||puntos[0]==null))
+            linea(puntosFinales[3].x, puntosFinales[3].y, puntosFinales[0].x, puntosFinales[0].y);
+
+        if(!(puntos[4]==null||puntos[5]==null))
+            linea(puntosFinales[4].x, puntosFinales[4].y, puntosFinales[5].x, puntosFinales[5].y);
+        if(!(puntos[5]==null||puntos[6]==null))
+            linea(puntosFinales[5].x, puntosFinales[5].y, puntosFinales[6].x, puntosFinales[6].y);
+        if(!(puntos[6]==null||puntos[7]==null))
+            linea(puntosFinales[6].x, puntosFinales[6].y, puntosFinales[7].x, puntosFinales[7].y);
+        if(!(puntos[7]==null||puntos[4]==null))
+            linea(puntosFinales[7].x, puntosFinales[7].y, puntosFinales[4].x, puntosFinales[4].y);
+
+        if(!(puntos[0]==null||puntos[4]==null))
+            linea(puntosFinales[0].x, puntosFinales[0].y, puntosFinales[4].x, puntosFinales[4].y);
+        if(!(puntos[1]==null||puntos[5]==null))
+            linea(puntosFinales[1].x, puntosFinales[1].y, puntosFinales[5].x, puntosFinales[5].y);
+        if(!(puntos[2]==null||puntos[6]==null))
+            linea(puntosFinales[2].x, puntosFinales[2].y, puntosFinales[6].x, puntosFinales[6].y);
+        if(!(puntos[3]==null||puntos[7]==null))
+            linea(puntosFinales[3].x, puntosFinales[3].y, puntosFinales[7].x, puntosFinales[7].y);
     }
 
     public void linea3D(int x1,int y1, int z1,int x2,int y2, int z2) {
