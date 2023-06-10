@@ -7,7 +7,8 @@ public class Animador {
     int dx = 0, dy = 0;
     double sx = 1, sy = 1;
     double theta = 0;
-    private boolean isSuave = false;
+    private boolean isSuave = true;
+    public double rotX3D=-0.2;
 
     public void traslacion(int dxDestino, int dyDestino, long inicioAnimacion, long finAnimacion) {
         if (tiempoActual < inicioAnimacion) {
@@ -73,6 +74,43 @@ public class Animador {
             theta += thetaDestino;
         }
     }
+    public void rotacionY3D(double thetaInicio,double thetaDestino, long inicioAnimacion, long finAnimacion) {
+        if (tiempoActual < inicioAnimacion) {
+            return;
+        }
+
+        if (tiempoActual <= finAnimacion) {
+            long milisegundosAnimados = tiempoActual - inicioAnimacion;
+            long duracionAnimacion = finAnimacion - inicioAnimacion;
+
+            double tiempoAnimado = (double) milisegundosAnimados / duracionAnimacion;
+            double porcentajeAnimacion = ease(tiempoAnimado);
+
+            dibujar.setVectorRotacion(rotX3D,(double) (thetaInicio + thetaDestino * porcentajeAnimacion),0);
+        }else{
+            dibujar.setVectorRotacion(rotX3D,(double) (thetaInicio + thetaDestino ),0);
+
+        }
+    }
+    public void escalacion3D(double dInicio,double dDestino, long inicioAnimacion, long finAnimacion) {
+        if (tiempoActual < inicioAnimacion) {
+            return;
+        }
+
+        if (tiempoActual <= finAnimacion) {
+            long milisegundosAnimados = tiempoActual - inicioAnimacion;
+            long duracionAnimacion = finAnimacion - inicioAnimacion;
+
+            double tiempoAnimado = (double) milisegundosAnimados / duracionAnimacion;
+            double porcentajeAnimacion = ease(tiempoAnimado);
+            double escala=(double) (dInicio + dDestino * porcentajeAnimacion);
+            dibujar.setVectorEscalacion(escala,escala,escala);
+        }else{
+            double escala=(double) (dInicio + dDestino);
+            dibujar.setVectorEscalacion(escala,escala,escala);
+
+        }
+    }
 
     public void setInicioAplicacion(long inicioAplicacion) {
         this.inicioAplicacion = inicioAplicacion;
@@ -90,12 +128,12 @@ public class Animador {
         sx = 1;
         sy = 1;
         theta = 0;
-        isSuave=false;
+        isSuave=true;
         dibujar.reiniciarTransformaciones();
     }
     public void reiniciarRotacion() {
         theta = 0;
-        isSuave=false;
+        isSuave=true;
         dibujar.reiniciarRotacion();
     }
 
