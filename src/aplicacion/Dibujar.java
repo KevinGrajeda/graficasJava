@@ -1,3 +1,4 @@
+
 package aplicacion;
 
 import javax.swing.*;
@@ -17,43 +18,11 @@ public class Dibujar {
     private Coordenada3DDouble vectorRotacion = new Coordenada3DDouble(0, 0, 0);
     private Coordenada3DDouble vectorTraslacion = new Coordenada3DDouble(0, 0, 0);
     private Coordenada3DDouble vectorEscalacion = new Coordenada3DDouble(1, 1, 1);
-
-    public void setVectorProyeccion(Coordenada3D vectorProyeccion) {
-        this.vectorProyeccion = vectorProyeccion;
-    }
-
     private Coordenada3D vectorProyeccion = new Coordenada3D(0, 0, 0);
 
-    public void setVectorRotacion(double x, double y, double z) {
-        this.vectorRotacion = new Coordenada3DDouble(x, y, z);
-    }
 
-    public void setVectorEscalacion(double x, double y, double z) {
-        this.vectorEscalacion = new Coordenada3DDouble(x, y, z);
-    }
-
-    public void setVectorTraslacion(double x, double y, double z) {
-        this.vectorTraslacion = new Coordenada3DDouble(x, y, z);
-    }
-
-    public void setImage(BufferedImage image) {
-        this.image = image;
-    }
-
-    public void resetImage(JFrame ventana){
-        this.image=new BufferedImage(ventana.getWidth(), ventana.getHeight(), BufferedImage.TYPE_INT_ARGB);
-    }
-
-    public Dibujar(BufferedImage image) {
-        this.image = image;
-    }
-    public Dibujar() {
-
-    }
-    public void putPixel(int x, int y, Color color) {
-        if ((x < 0 || x >= image.getWidth()) || (y < 0 || y >= image.getHeight()))
-            return;
-        image.setRGB(x, y, color.getRGB());
+    public Dibujar(JFrame frame) {
+        resetImage(frame);
     }
 
     public void putPixel(int x, int y) {
@@ -66,6 +35,342 @@ public class Dibujar {
         if ((x < 0 || x >= image.getWidth()) || (y < 0 || y >= image.getHeight()))
             return null;
         return new Color(image.getRGB(x, y));
+    }
+
+    public void lineaEcuacion(int x1, int y1, int x2, int y2) {
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        boolean avanzaY = dy > dx;
+        if (avanzaY) {
+            int temp = x1;
+            x1 = y1;
+            y1 = temp;
+            temp = x2;
+            x2 = y2;
+            y2 = temp;
+        }
+        if (x1 > x2) {
+            int temp = x1;
+            x1 = x2;
+            x2 = temp;
+            temp = y1;
+            y1 = y2;
+            y2 = temp;
+        }
+        double pendiente = (double) (y2 - y1) / (x2 - x1);
+        double b = y1 - pendiente * x1;
+        for (int x = x1; x <= x2; x++) {
+            int y = (int) (pendiente * x + b);
+            if (avanzaY) {
+                putPixel(y, x);
+            } else {
+                putPixel(x, y);
+            }
+        }
+    }
+
+    public void lineaDDA(int x1, int y1, int x2, int y2) {
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        int pasos = Math.max(Math.abs(dx), Math.abs(dy));
+        double xInc = (double) dx / pasos;
+        double yInc = (double) dy / pasos;
+        double x = x1, y = y1;
+        putPixel((int) Math.round(x), (int) Math.round(y));
+        for (int i = 0; i <= pasos; i++) {
+            x += xInc;
+            y += yInc;
+            putPixel((int) Math.round(x), (int) Math.round(y));
+        }
+    }
+
+    public void lineaBresenham(int x1, int y1, int x2, int y2) {
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        boolean avanzaY = dy > dx;
+        if (avanzaY) {
+            int temp = x1;
+            x1 = y1;
+            y1 = temp;
+            temp = x2;
+            x2 = y2;
+            y2 = temp;
+        }
+        if (x1 > x2) {
+            int temp = x1;
+            x1 = x2;
+            x2 = temp;
+            temp = y1;
+            y1 = y2;
+            y2 = temp;
+        }
+        dx = x2 - x1;
+        dy = Math.abs(y2 - y1);
+        int A = 2 * dy, B = 2 * dy - 2 * dx;
+        int p = 2 * dy - dx;
+        int y = y1;
+        int sumaY = y1 < y2 ? 1 : -1;
+        for (int x = x1; x <= x2; x++) {
+            if (p < 0) {
+                p += A;
+            } else {
+                y += sumaY;
+                p += B;
+            }
+            if (avanzaY) {
+                putPixel(y, x);
+            } else {
+                putPixel(x, y);
+            }
+        }
+
+    }
+
+    public void lineaPuntoMedio(int x1, int y1, int x2, int y2) {
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        boolean avanzaY = dy > dx;
+
+        if (avanzaY) {
+            int temp = x1;
+            x1 = y1;
+            y1 = temp;
+            temp = x2;
+            x2 = y2;
+            y2 = temp;
+        }
+
+        if (x1 > x2) {
+            int temp = x1;
+            x1 = x2;
+            x2 = temp;
+            temp = y1;
+            y1 = y2;
+            y2 = temp;
+        }
+
+        dx = x2 - x1;
+        dy = Math.abs(y2 - y1);
+
+
+        int dosDy = 2 * dy;
+        int dosDymenosDx = 2 * (dy - dx);
+        int p = 2 * dy - dx;
+
+        int y = y1;
+        for (int x = x1; x <= x2; x++) {
+            if (avanzaY) {
+                putPixel(y, x);
+            } else {
+                putPixel(x, y);
+            }
+            if (p > 0) {
+                p += dosDymenosDx;
+                y += (y2 > y1 ? 1 : -1);
+            } else {
+                p += dosDy;
+            }
+        }
+    }
+
+    // línea con transformaciones aplicadas
+    public void linea(int x1, int y1, int x2, int y2) {
+
+        CoordenadaInt pos1 = calcularTransformaciones(new CoordenadaInt(x1, y1));
+        CoordenadaInt pos2 = calcularTransformaciones(new CoordenadaInt(x2, y2));
+        x1 = pos1.x;
+        y1 = pos1.y;
+
+        x2 = pos2.x;
+        y2 = pos2.y;
+        lineaPuntoMedio(x1, y1, x2, y2);
+    }
+
+    public void rectangulo(int x1, int y1, int x2, int y2) {
+        linea(x1, y1, x2, y1);
+        linea(x2, y1, x2, y2);
+        linea(x2, y2, x1, y2);
+        linea(x1, y2, x1, y1);
+    }
+
+    public void circulo1(int xc, int yc, int r) {
+        for (int xPos = xc - r; xPos <= xc + r; xPos++) {
+            double yPos = (double) (yc + Math.sqrt(Math.pow(r, 2) - Math.pow(xPos - xc, 2)));
+            putPixel(xPos, (int) Math.round(yPos));
+        }
+        for (int xPos = xc - r; xPos <= xc + r; xPos++) {
+            double yPos = (double) (yc - Math.sqrt(Math.pow(r, 2) - Math.pow(xPos - xc, 2)));
+            putPixel(xPos, (int) Math.round(yPos));
+        }
+    }
+
+    public void circuloPolar(int xc, int yc, int r) {
+        for (double angulo = 0; angulo <= Math.PI / 2; angulo += 0.01) {
+            double xPos = (double) (xc + r * Math.sin(angulo));
+            double yPos = (double) (xc + r * Math.cos(angulo));
+            putPixel((int) xPos, (int) yPos);
+        }
+        for (double angulo = (double) (Math.PI / 2); angulo <= Math.PI; angulo += 0.01) {
+            double xPos = (double) (xc + r * Math.sin(angulo));
+            double yPos = (double) (xc + r * Math.cos(angulo));
+            putPixel((int) xPos, (int) yPos);
+        }
+        for (double angulo = (double) Math.PI; angulo <= Math.PI * (3 / 2); angulo += 0.01) {
+            double xPos = (double) (xc + r * Math.sin(angulo));
+            double yPos = (double) (xc + r * Math.cos(angulo));
+            putPixel((int) xPos, (int) yPos);
+        }
+        for (double angulo = (double) (Math.PI * (3 / 2)); angulo <= 2 * Math.PI; angulo += 0.01) {
+            double xPos = (double) (xc + r * Math.sin(angulo));
+            double yPos = (double) (xc + r * Math.cos(angulo));
+            putPixel((int) xPos, (int) yPos);
+        }
+
+    }
+
+    public void circuloPuntoMedio(int xc, int yc, double R) {
+        CoordenadaInt pos = calcularTraslacion(new CoordenadaInt(xc, yc));
+        xc = pos.x;
+        yc = pos.y;
+//        putPixel(0, (int) R);
+        int xk = -1;
+        int yk = (int) R;
+        double pk = (double) (5 / 4) - R;
+        while (xk <= yk) {
+            xk += 1;
+            if (pk < 0) {
+                putPixel(xk + xc, yk + yc);
+                pk = pk + 2 * xk + 3;
+            } else {
+                yk -= 1;
+                putPixel(xk + xc, yk + yc);
+                pk = pk + 2 * xk - 2 * yk + 5;
+            }
+            // simetria
+            putPixel(xk + xc, -yk + yc);
+            putPixel(-xk + xc, yk + yc);
+            putPixel(-xk + xc, -yk + yc);
+            putPixel(yk + xc, xk + yc);
+            putPixel(-yk + xc, xk + yc);
+            putPixel(yk + xc, -xk + yc);
+            putPixel(-yk + xc, -xk + yc);
+        }
+    }
+
+    public void elipse(int xc, int yc, int rx, int ry) {
+        CoordenadaDouble centro = calularRotacion(new CoordenadaDouble(xc, yc));
+        xc = (int) centro.x;
+        yc = (int) centro.y;
+
+        int x1 = xc - rx;
+        int y1 = yc - ry;
+        int x2 = xc + rx;
+        int y2 = yc + ry;
+        CoordenadaDouble pos1 = calcularTraslacion(calcularEscalacion(new CoordenadaDouble(x1, y1)));
+        CoordenadaDouble pos2 = calcularTraslacion(calcularEscalacion(new CoordenadaDouble(x2, y2)));
+        x1 = (int) pos1.x;
+        y1 = (int) pos1.y;
+
+        x2 = (int) pos2.x;
+        y2 = (int) pos2.y;
+
+        xc = (x1 + x2) / 2;
+        yc = (y1 + y2) / 2;
+        rx = (x2 - x1) / 2;
+        ry = (y2 - y1) / 2;
+
+
+        for (double angulo = 0; angulo <= 2 * Math.PI; angulo += 0.005) {
+            double xPos = (double) (xc + rx * Math.cos(theta) * Math.cos(angulo) - ry * Math.sin(theta) * Math.sin(angulo));
+            double yPos = (double) (yc + rx * Math.sin(theta) * Math.cos(angulo) + ry * Math.cos(theta) * Math.sin(angulo));
+
+            putPixel((int) xPos, (int) yPos);
+        }
+    }
+
+    public void floodFill(int x, int y) {
+        Color colorRelleno=color;
+        CoordenadaInt pos1 = calcularTransformaciones(new CoordenadaInt(x, y));
+        x = pos1.x;
+        y = pos1.y;
+        Color colorObjetivo = getPixel(x, y);
+
+        if ((x < 0 || x >= image.getWidth()) || (y < 0 || y >= image.getHeight()))
+            return;
+        if (colorObjetivo.equals(colorRelleno)) {
+            return;
+        }
+
+        Stack<CoordenadaInt> pila = new Stack<>();
+        pila.push(new CoordenadaInt(x, y));
+
+        while (!pila.isEmpty()) {
+            CoordenadaInt p = pila.pop();
+            int xPos = p.x;
+            int yPos = p.y;
+            putPixel(xPos, yPos);
+
+            if (xPos > 0 && getPixel(xPos - 1, yPos).equals(colorObjetivo)) {
+                pila.push(new CoordenadaInt(xPos - 1, yPos));
+            }
+            if (xPos < image.getWidth() - 1 && getPixel(xPos + 1, yPos).equals(colorObjetivo)) {
+                pila.push(new CoordenadaInt(xPos + 1, yPos));
+            }
+            if (yPos > 0 && getPixel(xPos, yPos - 1).equals(colorObjetivo)) {
+                pila.push(new CoordenadaInt(xPos, yPos - 1));
+            }
+            if (yPos < image.getHeight() - 1 && getPixel(xPos, yPos + 1).equals(colorObjetivo)) {
+                pila.push(new CoordenadaInt(xPos, yPos + 1));
+            }
+        }
+    }
+
+    public void scanLineFill(int x, int y) {
+        Color colorRelleno = color;
+        CoordenadaInt pos1 = calcularTransformaciones(new CoordenadaInt(x, y));
+        x = pos1.x;
+        y = pos1.y;
+        Color colorObjetivo = getPixel(x, y);
+        if (colorObjetivo == null) {
+            return;
+        }
+        if (!colorObjetivo.equals(colorRelleno)) {
+            Stack<CoordenadaInt> pila = new Stack<CoordenadaInt>();
+            pila.push(new CoordenadaInt(x, y));
+
+            while (!pila.empty()) {
+                CoordenadaInt p = pila.pop();
+
+                if (getPixel(p.x, p.y).equals(colorObjetivo)) {
+                    int xIzq = p.x;
+                    int xDer = p.x;
+
+                    while (xIzq >= 0 && getPixel(xIzq, p.y).equals(colorObjetivo)) {
+                        xIzq--;
+                    }
+
+                    while (xDer < image.getWidth() && getPixel(xDer, p.y).equals(colorObjetivo)) {
+                        xDer++;
+                    }
+
+                    for (int i = xIzq + 1; i < xDer; i++) {
+                        putPixel(i, p.y);
+                    }
+
+                    for (int i = xIzq + 1; i < xDer; i++) {
+                        if (p.y > 0 && getPixel(i, p.y - 1).equals(colorObjetivo)) {
+                            pila.push(new CoordenadaInt(i, p.y - 1));
+                        }
+                    }
+
+                    for (int i = xIzq + 1; i < xDer; i++) {
+                        if (p.y < image.getHeight() - 1 && getPixel(i, p.y + 1).equals(colorObjetivo)) {
+                            pila.push(new CoordenadaInt(i, p.y + 1));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private CoordenadaDouble calcularEscalacion(CoordenadaDouble origen) {
@@ -164,154 +469,6 @@ public class Dibujar {
         return new CoordenadaDouble(resultado[0][0], resultado[0][1]);
     }
 
-    private Coordenada3DDouble rotacion3D(Coordenada3DDouble origen) {
-
-        double[][] matrizOrigen = {{origen.x, origen.y, origen.z, 1}};
-        // Convert angles to radians
-        double radianX = vectorRotacion.x;
-        double radianY = vectorRotacion.y;
-        double radianZ = vectorRotacion.z;
-
-        // Create the rotation matrix
-        double[][] matrizTransformacion = {
-                {Math.cos(radianY) * Math.cos(radianZ), -Math.cos(radianX) * Math.sin(radianZ) + Math.sin(radianX) * Math.sin(radianY) * Math.cos(radianZ), Math.sin(radianX) * Math.sin(radianZ) + Math.cos(radianX) * Math.sin(radianY) * Math.cos(radianZ), 0},
-                {Math.cos(radianY) * Math.sin(radianZ), Math.cos(radianX) * Math.cos(radianZ) + Math.sin(radianX) * Math.sin(radianY) * Math.sin(radianZ), -Math.sin(radianX) * Math.cos(radianZ) + Math.cos(radianX) * Math.sin(radianY) * Math.sin(radianZ), 0},
-                {-Math.sin(radianY), Math.sin(radianX) * Math.cos(radianY), Math.cos(radianX) * Math.cos(radianY), 0},
-                {0, 0, 0, 1}
-        };
-
-        double[][] resultado = multiplicarMatriz4x4(matrizOrigen, matrizTransformacion);
-
-        return new Coordenada3DDouble(resultado[0][0], resultado[0][1], resultado[0][2]);
-    }
-
-    private Coordenada3DDouble traslacion3D(Coordenada3DDouble origen) {
-
-        double[][] matrizOrigen = {{origen.x, origen.y, origen.z, 1}};
-        // Create the rotation matrix
-        double[][] matrizTransformacion = {
-                {1, 0, 0, 0},
-                {0, 1, 0, 0},
-                {0, 0, 1, 0},
-                {vectorTraslacion.x, vectorTraslacion.y, vectorTraslacion.z, 1}
-        };
-        double[][] resultado = multiplicarMatriz4x4(matrizOrigen, matrizTransformacion);
-
-        return new Coordenada3DDouble(resultado[0][0], resultado[0][1], resultado[0][2]);
-    }
-
-    private Coordenada3DDouble escalacion3D(Coordenada3DDouble origen) {
-
-        double[][] matrizOrigen = {{origen.x, origen.y, origen.z, 1}};
-        // Create the rotation matrix
-        double[][] matrizTransformacion = {
-                {vectorEscalacion.x, 0, 0, 0},
-                {0, vectorEscalacion.y, 0, 0},
-                {0, 0, vectorEscalacion.z, 0},
-                {0, 0, 0, 1}
-        };
-        double[][] resultado = multiplicarMatriz4x4(matrizOrigen, matrizTransformacion);
-
-        return new Coordenada3DDouble(resultado[0][0], resultado[0][1], resultado[0][2]);
-    }
-
-    private CoordenadaInt calcularTransformaciones(CoordenadaInt puntoOrigen) {
-        CoordenadaDouble punto = new CoordenadaDouble(puntoOrigen.x, puntoOrigen.y);
-        CoordenadaDouble puntoDestino = calcularTraslacion(calcularEscalacion(calularRotacion(punto)));
-        return new CoordenadaInt((int) puntoDestino.x, (int) puntoDestino.y);
-    }
-
-
-    private double[][] multiplicarMatriz(double[][] matrizOrigen, double[][] matrizTransformacion) {
-        double[][] resultado = new double[1][3];
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 3; j++) {
-                for (int k = 0; k < 3; k++) {
-                    resultado[i][j] += matrizOrigen[i][k] * matrizTransformacion[k][j];
-                }
-            }
-        }
-        return resultado;
-    }
-
-    private double[][] multiplicarMatriz4x4(double[][] matrizOrigen, double[][] matrizTransformacion) {
-        int filasOrigen = matrizOrigen.length;
-        int columnasOrigen = matrizOrigen[0].length;
-        int columnasTransformacion = matrizTransformacion[0].length;
-
-        double[][] resultado = new double[filasOrigen][columnasTransformacion];
-
-        for (int i = 0; i < filasOrigen; i++) {
-            for (int j = 0; j < columnasTransformacion; j++) {
-                for (int k = 0; k < columnasOrigen; k++) {
-                    resultado[i][j] += matrizOrigen[i][k] * matrizTransformacion[k][j];
-                }
-            }
-        }
-
-        return resultado;
-    }
-
-    private int[][] multiplicarMatriz(int[][] matrizOrigen, int[][] matrizTransformacion) {
-        int[][] resultado = new int[1][3];
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 3; j++) {
-                for (int k = 0; k < 3; k++) {
-                    resultado[i][j] += matrizOrigen[i][k] * matrizTransformacion[k][j];
-                }
-            }
-        }
-        return resultado;
-    }
-
-    public void traslacion(int dxNuevo, int dyNuevo) {
-        dx = dxNuevo;
-        dy = dyNuevo;
-    }
-
-    public void traslacionAnimacion(int dxNuevo, int dyNuevo) {
-        dxAnimacion = dxNuevo;
-        dyAnimacion = dyNuevo;
-    }
-
-    public void escalacion(double sxNuevo, double syNuevo) {
-        sx = sxNuevo;
-        sy = syNuevo;
-    }
-
-    public void escalacionAnimacion(double sxNuevo, double syNuevo) {
-        sxAnimacion = sxNuevo;
-        syAnimacion = syNuevo;
-    }
-
-    public void rotacion(double anguloNuevo) {
-        theta = anguloNuevo;
-    }
-
-    public void malla(int x1, int y1, int x2, int y2) {
-//        CoordenadaInt pos1 = calcularTransformaciones(new CoordenadaInt(x1, y1));
-//        CoordenadaInt pos2 = calcularTransformaciones(new CoordenadaInt(x2, y2));
-
-//        x1 = pos1.x;
-//        y1 = pos1.y;
-//
-//        x2 = pos2.x;
-//        y2 = pos2.y;
-
-//        double tamPaso = (double) (x2 - x1) / pasos;
-//        for (double x = x1; x <= x2; x += 10) {
-//            for (double y = y1; y <= y2; y += 10) {
-//                circuloPuntoMedio((int) x, (int) y, 1);
-//            }
-//        }
-        for (double x = x1; x <= x2; x += 4) {
-            lineaBresenham((int) x, y1, (int) x, y2);
-        }
-        for (double y = y1; y <= y2; y += 10) {
-            lineaBresenham(x1, (int) y, x2, (int) y);
-        }
-    }
-
     public void curva1(int x, int y, int ancho, int alto, int pasos) {
         CoordenadaInt puntoAnterior = new CoordenadaInt(x, y - (int) (Math.sin(0) * 200));
         for (double i = 0; i < Math.PI; i += Math.PI / pasos) {
@@ -396,350 +553,12 @@ public class Dibujar {
         }
     }
 
-    public void lineaEcuacion(int x1, int y1, int x2, int y2) {
-        int dx = Math.abs(x2 - x1);
-        int dy = Math.abs(y2 - y1);
-        boolean avanzaY = dy > dx;
-        if (avanzaY) {
-            int temp = x1;
-            x1 = y1;
-            y1 = temp;
-            temp = x2;
-            x2 = y2;
-            y2 = temp;
+    public void malla(int x1, int y1, int x2, int y2) {
+        for (double x = x1; x <= x2; x += 4) {
+            lineaBresenham((int) x, y1, (int) x, y2);
         }
-        if (x1 > x2) {
-            int temp = x1;
-            x1 = x2;
-            x2 = temp;
-            temp = y1;
-            y1 = y2;
-            y2 = temp;
-        }
-        double pendiente = (double) (y2 - y1) / (x2 - x1);
-        double b = y1 - pendiente * x1;
-        for (int x = x1; x <= x2; x++) {
-            int y = (int) (pendiente * x + b);
-            if (avanzaY) {
-                putPixel(y, x);
-            } else {
-                putPixel(x, y);
-            }
-        }
-    }
-
-    public void lineaDDA(int x1, int y1, int x2, int y2) {
-        int dx = x2 - x1;
-        int dy = y2 - y1;
-        int pasos = Math.max(Math.abs(dx), Math.abs(dy));
-        double xInc = (double) dx / pasos;
-        double yInc = (double) dy / pasos;
-        double x = x1, y = y1;
-        putPixel((int) Math.round(x), (int) Math.round(y));
-        for (int i = 0; i <= pasos; i++) {
-            x += xInc;
-            y += yInc;
-            putPixel((int) Math.round(x), (int) Math.round(y));
-        }
-    }
-
-    public void linea(int x1, int y1, int x2, int y2) {
-
-        CoordenadaInt pos1 = calcularTransformaciones(new CoordenadaInt(x1, y1));
-        CoordenadaInt pos2 = calcularTransformaciones(new CoordenadaInt(x2, y2));
-        x1 = pos1.x;
-        y1 = pos1.y;
-
-        x2 = pos2.x;
-        y2 = pos2.y;
-        lineaPuntoMedio(x1, y1, x2, y2);
-    }
-
-
-    public void lineaBresenham(int x1, int y1, int x2, int y2) {
-        int dx = Math.abs(x2 - x1);
-        int dy = Math.abs(y2 - y1);
-        boolean avanzaY = dy > dx;
-        if (avanzaY) {
-            int temp = x1;
-            x1 = y1;
-            y1 = temp;
-            temp = x2;
-            x2 = y2;
-            y2 = temp;
-        }
-        if (x1 > x2) {
-            int temp = x1;
-            x1 = x2;
-            x2 = temp;
-            temp = y1;
-            y1 = y2;
-            y2 = temp;
-        }
-        dx = x2 - x1;
-        dy = Math.abs(y2 - y1);
-        int A = 2 * dy, B = 2 * dy - 2 * dx;
-        int p = 2 * dy - dx;
-        int y = y1;
-        int sumaY = y1 < y2 ? 1 : -1;
-        for (int x = x1; x <= x2; x++) {
-            if (p < 0) {
-                p += A;
-            } else {
-                y += sumaY;
-                p += B;
-            }
-            if (avanzaY) {
-                putPixel(y, x);
-            } else {
-                putPixel(x, y);
-            }
-        }
-
-    }
-
-    public void lineaPuntoMedio(int x1, int y1, int x2, int y2) {
-        int dx = Math.abs(x2 - x1);
-        int dy = Math.abs(y2 - y1);
-        boolean avanzaY = dy > dx;
-
-        if (avanzaY) {
-            int temp = x1;
-            x1 = y1;
-            y1 = temp;
-            temp = x2;
-            x2 = y2;
-            y2 = temp;
-        }
-
-        if (x1 > x2) {
-            int temp = x1;
-            x1 = x2;
-            x2 = temp;
-            temp = y1;
-            y1 = y2;
-            y2 = temp;
-        }
-
-        dx = x2 - x1;
-        dy = Math.abs(y2 - y1);
-
-
-        int dosDy = 2 * dy;
-        int dosDymenosDx = 2 * (dy - dx);
-        int p = 2 * dy - dx;
-
-        int y = y1;
-        for (int x = x1; x <= x2; x++) {
-            if (avanzaY) {
-                putPixel(y, x);
-            } else {
-                putPixel(x, y);
-            }
-            if (p > 0) {
-                p += dosDymenosDx;
-                y += (y2 > y1 ? 1 : -1);
-            } else {
-                p += dosDy;
-            }
-        }
-    }
-
-    public void circulo1(int xc, int yc, int r) {
-        for (int xPos = xc - r; xPos <= xc + r; xPos++) {
-            double yPos = (double) (yc + Math.sqrt(Math.pow(r, 2) - Math.pow(xPos - xc, 2)));
-            putPixel(xPos, (int) Math.round(yPos));
-        }
-        for (int xPos = xc - r; xPos <= xc + r; xPos++) {
-            double yPos = (double) (yc - Math.sqrt(Math.pow(r, 2) - Math.pow(xPos - xc, 2)));
-            putPixel(xPos, (int) Math.round(yPos));
-        }
-    }
-
-    public void circuloPolar(int xc, int yc, int r) {
-        for (double angulo = 0; angulo <= Math.PI / 2; angulo += 0.01) {
-            double xPos = (double) (xc + r * Math.sin(angulo));
-            double yPos = (double) (xc + r * Math.cos(angulo));
-            putPixel((int) xPos, (int) yPos);
-        }
-        for (double angulo = (double) (Math.PI / 2); angulo <= Math.PI; angulo += 0.01) {
-            double xPos = (double) (xc + r * Math.sin(angulo));
-            double yPos = (double) (xc + r * Math.cos(angulo));
-            putPixel((int) xPos, (int) yPos);
-        }
-        for (double angulo = (double) Math.PI; angulo <= Math.PI * (3 / 2); angulo += 0.01) {
-            double xPos = (double) (xc + r * Math.sin(angulo));
-            double yPos = (double) (xc + r * Math.cos(angulo));
-            putPixel((int) xPos, (int) yPos);
-        }
-        for (double angulo = (double) (Math.PI * (3 / 2)); angulo <= 2 * Math.PI; angulo += 0.01) {
-            double xPos = (double) (xc + r * Math.sin(angulo));
-            double yPos = (double) (xc + r * Math.cos(angulo));
-            putPixel((int) xPos, (int) yPos);
-        }
-
-    }
-
-    public void rectangulo(int x1, int y1, int x2, int y2) {
-
-
-        linea(x1, y1, x2, y1);
-        linea(x2, y1, x2, y2);
-        linea(x2, y2, x1, y2);
-        linea(x1, y2, x1, y1);
-    }
-
-    // int ancho = Math.abs(x1 - x2);
-    // int altura = Math.abs(y1 - y2);
-    // int xInicio = Math.min(x1, x2);
-    // int yInicio = Math.min(y1, y2);
-    // lineaBresenham(xInicio, yInicio, xInicio + ancho, yInicio);
-    // lineaBresenham(xInicio, yInicio, xInicio, yInicio + altura);
-    // lineaBresenham(xInicio, yInicio + altura, xInicio + ancho, yInicio + altura);
-    // lineaBresenham(xInicio + ancho, yInicio, xInicio + ancho, yInicio + altura);
-
-    public void elipse(int xc, int yc, int rx, int ry) {
-        CoordenadaDouble centro = calularRotacion(new CoordenadaDouble(xc, yc));
-        xc = (int) centro.x;
-        yc = (int) centro.y;
-
-        int x1 = xc - rx;
-        int y1 = yc - ry;
-        int x2 = xc + rx;
-        int y2 = yc + ry;
-        CoordenadaDouble pos1 = calcularTraslacion(calcularEscalacion(new CoordenadaDouble(x1, y1)));
-        CoordenadaDouble pos2 = calcularTraslacion(calcularEscalacion(new CoordenadaDouble(x2, y2)));
-        x1 = (int) pos1.x;
-        y1 = (int) pos1.y;
-
-        x2 = (int) pos2.x;
-        y2 = (int) pos2.y;
-
-        xc = (x1 + x2) / 2;
-        yc = (y1 + y2) / 2;
-        rx = (x2 - x1) / 2;
-        ry = (y2 - y1) / 2;
-
-
-        for (double angulo = 0; angulo <= 2 * Math.PI; angulo += 0.005) {
-            double xPos = (double) (xc + rx * Math.cos(theta) * Math.cos(angulo) - ry * Math.sin(theta) * Math.sin(angulo));
-            double yPos = (double) (yc + rx * Math.sin(theta) * Math.cos(angulo) + ry * Math.cos(theta) * Math.sin(angulo));
-
-            putPixel((int) xPos, (int) yPos);
-        }
-    }
-
-    public void circuloPuntoMedio(int xc, int yc, double R) {
-        CoordenadaInt pos = calcularTraslacion(new CoordenadaInt(xc, yc));
-        xc = pos.x;
-        yc = pos.y;
-//        putPixel(0, (int) R);
-        int xk = -1;
-        int yk = (int) R;
-        double pk = (double) (5 / 4) - R;
-        while (xk <= yk) {
-            xk += 1;
-            if (pk < 0) {
-                putPixel(xk + xc, yk + yc);
-                pk = pk + 2 * xk + 3;
-            } else {
-                yk -= 1;
-                putPixel(xk + xc, yk + yc);
-                pk = pk + 2 * xk - 2 * yk + 5;
-            }
-            // simetria
-            putPixel(xk + xc, -yk + yc);
-            putPixel(-xk + xc, yk + yc);
-            putPixel(-xk + xc, -yk + yc);
-            putPixel(yk + xc, xk + yc);
-            putPixel(-yk + xc, xk + yc);
-            putPixel(yk + xc, -xk + yc);
-            putPixel(-yk + xc, -xk + yc);
-        }
-    }
-
-    public void floodFill(int x, int y, Color colorRelleno) {
-        CoordenadaInt pos1 = calcularTransformaciones(new CoordenadaInt(x, y));
-        x = pos1.x;
-        y = pos1.y;
-        Color colorObjetivo = getPixel(x, y);
-
-        if ((x < 0 || x >= image.getWidth()) || (y < 0 || y >= image.getHeight()))
-            return;
-        if (colorObjetivo.equals(colorRelleno)) {
-            return;
-        }
-
-        Stack<CoordenadaInt> pila = new Stack<>();
-        pila.push(new CoordenadaInt(x, y));
-
-        while (!pila.isEmpty()) {
-            CoordenadaInt p = pila.pop();
-            int xPos = p.x;
-            int yPos = p.y;
-            putPixel(xPos, yPos, colorRelleno);
-
-            if (xPos > 0 && getPixel(xPos - 1, yPos).equals(colorObjetivo)) {
-                pila.push(new CoordenadaInt(xPos - 1, yPos));
-            }
-            if (xPos < image.getWidth() - 1 && getPixel(xPos + 1, yPos).equals(colorObjetivo)) {
-                pila.push(new CoordenadaInt(xPos + 1, yPos));
-            }
-            if (yPos > 0 && getPixel(xPos, yPos - 1).equals(colorObjetivo)) {
-                pila.push(new CoordenadaInt(xPos, yPos - 1));
-            }
-            if (yPos < image.getHeight() - 1 && getPixel(xPos, yPos + 1).equals(colorObjetivo)) {
-                pila.push(new CoordenadaInt(xPos, yPos + 1));
-            }
-        }
-    }
-
-
-    public void scanLineFill(int x, int y) {
-        Color colorRelleno = color;
-        CoordenadaInt pos1 = calcularTransformaciones(new CoordenadaInt(x, y));
-        x = pos1.x;
-        y = pos1.y;
-        Color colorObjetivo = getPixel(x, y);
-        if (colorObjetivo == null) {
-            return;
-        }
-        if (!colorObjetivo.equals(colorRelleno)) {
-            Stack<CoordenadaInt> pila = new Stack<CoordenadaInt>();
-            pila.push(new CoordenadaInt(x, y));
-
-            while (!pila.empty()) {
-                CoordenadaInt p = pila.pop();
-
-                if (getPixel(p.x, p.y).equals(colorObjetivo)) {
-                    int xIzq = p.x;
-                    int xDer = p.x;
-
-                    while (xIzq >= 0 && getPixel(xIzq, p.y).equals(colorObjetivo)) {
-                        xIzq--;
-                    }
-
-                    while (xDer < image.getWidth() && getPixel(xDer, p.y).equals(colorObjetivo)) {
-                        xDer++;
-                    }
-
-                    for (int i = xIzq + 1; i < xDer; i++) {
-                        putPixel(i, p.y, colorRelleno);
-                    }
-
-                    for (int i = xIzq + 1; i < xDer; i++) {
-                        if (p.y > 0 && getPixel(i, p.y - 1).equals(colorObjetivo)) {
-                            pila.push(new CoordenadaInt(i, p.y - 1));
-                        }
-                    }
-
-                    for (int i = xIzq + 1; i < xDer; i++) {
-                        if (p.y < image.getHeight() - 1 && getPixel(i, p.y + 1).equals(colorObjetivo)) {
-                            pila.push(new CoordenadaInt(i, p.y + 1));
-                        }
-                    }
-                }
-            }
+        for (double y = y1; y <= y2; y += 10) {
+            lineaBresenham(x1, (int) y, x2, (int) y);
         }
     }
 
@@ -800,7 +619,7 @@ public class Dibujar {
         puntos[7] = new Coordenada3D(x, y + ancho, z + ancho);
 
         for (int i = 0; i < puntos.length; i++) {
-            puntos[i] = proyectarPunto(puntos[i], vector);
+            puntos[i] = proyectarParalela(puntos[i], vector);
         }
 
 
@@ -855,7 +674,7 @@ public class Dibujar {
 
 
         for (int i = 0; i < puntos.length; i++) {
-            puntos[i] = proyectarPunto(puntos[i], vector);
+            puntos[i] = proyectarParalela(puntos[i], vector);
         }
 
 
@@ -889,7 +708,7 @@ public class Dibujar {
         linea(puntos[7].x, puntos[7].y, puntos[15].x, puntos[15].y);
     }
 
-    public Coordenada3D proyectarPunto(Coordenada3D punto, Coordenada3DDouble vector) {
+    public Coordenada3D proyectarParalela(Coordenada3D punto, Coordenada3DDouble vector) {
         double u;
         if (vector.z == 0) {
             u = 0;
@@ -901,7 +720,7 @@ public class Dibujar {
         return new Coordenada3D(x, y, 0);
     }
 
-    public CoordenadaInt proyectarPuntoUnPuntoFuga(Coordenada3DDouble punto) {
+    public CoordenadaInt proyectarPerspectiva(Coordenada3DDouble punto) {
         double u;
         if ((punto.z - vectorProyeccion.z) == 0) {
             u = 0;
@@ -915,7 +734,7 @@ public class Dibujar {
         return new CoordenadaInt((int) x, (int) y);
     }
 
-    public void cuboUnPuntoFuga(int x, int y, int z, int ancho, int alto, int largo) {
+    public void cuboPerspectiva(int x, int y, int z, int ancho, int alto, int largo) {
 
         Coordenada3DDouble[] puntos = new Coordenada3DDouble[8];
 
@@ -935,7 +754,7 @@ public class Dibujar {
 
         CoordenadaInt[] puntosFinales = new CoordenadaInt[14];
         for (int i = 0; i < puntos.length; i++) {
-            puntosFinales[i] = proyectarPuntoUnPuntoFuga(puntos[i]);
+            puntosFinales[i] = proyectarPerspectiva(puntos[i]);
         }
 
 
@@ -957,7 +776,7 @@ public class Dibujar {
 
     }
 
-    public void cuboUnPuntoFill(int x, int y, int z, int ancho, int alto, int largo) {
+    public void cuboPerspectivaFill(int x, int y, int z, int ancho, int alto, int largo) {
 
         Coordenada3DDouble[] puntos = new Coordenada3DDouble[14];
 
@@ -997,7 +816,7 @@ public class Dibujar {
         CoordenadaInt[] puntosFinales = new CoordenadaInt[14];
         for (int i = 0; i < 14; i++) {
             if (indexMenor != i)
-                puntosFinales[i] = proyectarPuntoUnPuntoFuga(puntos[i]);
+                puntosFinales[i] = proyectarPerspectiva(puntos[i]);
         }
 
 
@@ -1031,12 +850,12 @@ public class Dibujar {
             linea(puntosFinales[3].x, puntosFinales[3].y, puntosFinales[7].x, puntosFinales[7].y);
 
         color = Color.ORANGE;
-        floodFill(puntosFinales[8].x, puntosFinales[8].y, color);
-        floodFill(puntosFinales[9].x, puntosFinales[9].y, color);
-        floodFill(puntosFinales[10].x, puntosFinales[10].y, color);
-        floodFill(puntosFinales[11].x, puntosFinales[11].y, color);
-        floodFill(puntosFinales[12].x, puntosFinales[12].y, color);
-        floodFill(puntosFinales[13].x, puntosFinales[13].y, color);
+        floodFill(puntosFinales[8].x, puntosFinales[8].y);
+        floodFill(puntosFinales[9].x, puntosFinales[9].y);
+        floodFill(puntosFinales[10].x, puntosFinales[10].y);
+        floodFill(puntosFinales[11].x, puntosFinales[11].y);
+        floodFill(puntosFinales[12].x, puntosFinales[12].y);
+        floodFill(puntosFinales[13].x, puntosFinales[13].y);
 
 
         color = Color.RED;
@@ -1081,7 +900,7 @@ public class Dibujar {
 
         CoordenadaInt[] puntosFinales = new CoordenadaInt[2];
         for (int i = 0; i < puntos.length; i++) {
-            puntosFinales[i] = proyectarPuntoUnPuntoFuga(puntos[i]);
+            puntosFinales[i] = proyectarPerspectiva(puntos[i]);
         }
         linea(puntosFinales[0].x, puntosFinales[0].y, puntosFinales[1].x, puntosFinales[1].y);
     }
@@ -1106,7 +925,7 @@ public class Dibujar {
                 double z = t;
                 Coordenada3DDouble punto3D = new Coordenada3DDouble(x, y, z);
                 punto3D = calcularTransformaciones3D(punto3D);
-                CoordenadaInt puntoNuevo = proyectarPuntoUnPuntoFuga(punto3D);
+                CoordenadaInt puntoNuevo = proyectarPerspectiva(punto3D);
                 puntos[cordX][cordY] = puntoNuevo;
                 cordY++;
             }
@@ -1141,75 +960,77 @@ public class Dibujar {
         vertices[6] = new Coordenada3DDouble(x + ancho / 2, y + alto / 2, z + largo / 2);
         vertices[7] = new Coordenada3DDouble(x - ancho / 2, y + alto / 2, z + largo / 2);
 
-        for(int i=0;i<vertices.length;i++){
-            vertices[i]=calcularTransformaciones3D(vertices[i]);
+        for (int i = 0; i < vertices.length; i++) {
+            vertices[i] = calcularTransformaciones3D(vertices[i]);
         }
 
         Face[] faces = new Face[6];
 
         // Face 1: Front
-        Coordenada3DDouble[] face1Vertices = { vertices[0], vertices[3], vertices[2], vertices[1] };
+        Coordenada3DDouble[] face1Vertices = {vertices[0], vertices[3], vertices[2], vertices[1]};
         faces[0] = new Face(face1Vertices);
 
         // Face 2: Back
-        Coordenada3DDouble[] face2Vertices = { vertices[4], vertices[5], vertices[6], vertices[7] };
+        Coordenada3DDouble[] face2Vertices = {vertices[4], vertices[5], vertices[6], vertices[7]};
         faces[1] = new Face(face2Vertices);
 
         // Face 3: Top
-        Coordenada3DDouble[] face3Vertices = { vertices[3], vertices[7], vertices[6], vertices[2] };
+        Coordenada3DDouble[] face3Vertices = {vertices[3], vertices[7], vertices[6], vertices[2]};
         faces[2] = new Face(face3Vertices);
 
         // Face 4: Bottom
-        Coordenada3DDouble[] face4Vertices = { vertices[0], vertices[1], vertices[5], vertices[4] };
+        Coordenada3DDouble[] face4Vertices = {vertices[0], vertices[1], vertices[5], vertices[4]};
         faces[3] = new Face(face4Vertices);
 
         // Face 5: Left
-        Coordenada3DDouble[] face5Vertices = { vertices[0], vertices[4], vertices[7], vertices[3] };
+        Coordenada3DDouble[] face5Vertices = {vertices[0], vertices[4], vertices[7], vertices[3]};
         faces[4] = new Face(face5Vertices);
 
         // Face 6: Right
-        Coordenada3DDouble[] face6Vertices = { vertices[1], vertices[2], vertices[6], vertices[5] };
+        Coordenada3DDouble[] face6Vertices = {vertices[1], vertices[2], vertices[6], vertices[5]};
         faces[5] = new Face(face6Vertices);
 
 
         drawFaces(faces);
     }
 
-    public void plano(int x,int y,int z, int ancho, int largo){
+    public void plano(int x, int y, int z, int ancho, int largo) {
         Coordenada3DDouble[] vertices = new Coordenada3DDouble[4];
 
-        vertices[0] = new Coordenada3DDouble(x - ancho / 2, y , z - largo / 2);
-        vertices[1] = new Coordenada3DDouble(x + ancho / 2, y , z - largo / 2);
-        vertices[2] = new Coordenada3DDouble(x + ancho / 2, y , z + largo / 2);
-        vertices[3] = new Coordenada3DDouble(x - ancho / 2, y , z + largo / 2);
+        vertices[0] = new Coordenada3DDouble(x - ancho / 2, y, z - largo / 2);
+        vertices[1] = new Coordenada3DDouble(x + ancho / 2, y, z - largo / 2);
+        vertices[2] = new Coordenada3DDouble(x + ancho / 2, y, z + largo / 2);
+        vertices[3] = new Coordenada3DDouble(x - ancho / 2, y, z + largo / 2);
 
-        for(int i=0;i<vertices.length;i++){
-            vertices[i]=calcularTransformaciones3D(vertices[i]);
+        for (int i = 0; i < vertices.length; i++) {
+            vertices[i] = calcularTransformaciones3D(vertices[i]);
         }
-        Face[] face ={ new Face(vertices)};
+        Face[] face = {new Face(vertices)};
         drawFaces(face);
 
     }
-    public void plano(Coordenada3D punto1,Coordenada3D punto2,Coordenada3D punto3,Coordenada3D punto4){
+
+    public void plano(Coordenada3D punto1, Coordenada3D punto2, Coordenada3D punto3, Coordenada3D punto4) {
         Coordenada3DDouble[] vertices = new Coordenada3DDouble[4];
 
-        vertices[0] = new Coordenada3DDouble(punto1.x,punto1.y,punto1.z);
-        vertices[1] = new Coordenada3DDouble(punto2.x,punto2.y,punto2.z);
-        vertices[2] = new Coordenada3DDouble(punto3.x,punto3.y,punto3.z);
-        vertices[3] = new Coordenada3DDouble(punto4.x,punto4.y,punto4.z);
+        vertices[0] = new Coordenada3DDouble(punto1.x, punto1.y, punto1.z);
+        vertices[1] = new Coordenada3DDouble(punto2.x, punto2.y, punto2.z);
+        vertices[2] = new Coordenada3DDouble(punto3.x, punto3.y, punto3.z);
+        vertices[3] = new Coordenada3DDouble(punto4.x, punto4.y, punto4.z);
 
-        for(int i=0;i<vertices.length;i++){
-            vertices[i]=calcularTransformaciones3D(vertices[i]);
+        for (int i = 0; i < vertices.length; i++) {
+            vertices[i] = calcularTransformaciones3D(vertices[i]);
         }
-        Face[] face ={ new Face(vertices)};
+        Face[] face = {new Face(vertices)};
         drawFaces(face);
 
     }
+
     private void drawFaces(Face[] faces) {
 
-        Coordenada3DDouble cameraPosition = new Coordenada3DDouble(vectorProyeccion.x,vectorProyeccion.y,-vectorProyeccion.z);
+        Coordenada3DDouble cameraPosition = new Coordenada3DDouble(vectorProyeccion.x, vectorProyeccion.y, -vectorProyeccion.z);
 
-        Color colorGuardado=color;
+        Color colorGuardado = color;
         for (int i = 0; i < faces.length; i++) {
             Coordenada3DDouble normal = faces[i].getNormal();
 
@@ -1221,41 +1042,188 @@ public class Dibujar {
             );
 
             double dotProduct = normal.dotProduct(direction);
-            if(dotProduct>0){
-                Face currentFace= faces[i];
+            if (dotProduct > 0) {
+                Face currentFace = faces[i];
 
                 CoordenadaInt[] puntosFinales = new CoordenadaInt[4];
                 for (int j = 0; j < 4; j++) {
-                    puntosFinales[j] = proyectarPuntoUnPuntoFuga(currentFace.vertices[j]);
+                    puntosFinales[j] = proyectarPerspectiva(currentFace.vertices[j]);
                 }
 
                 // calcular el angulo en radianes
-                double angle = Math.acos(dotProduct/-vectorProyeccion.z);
+                double angle = Math.acos(dotProduct / -vectorProyeccion.z);
 
                 double angleDegrees = Math.toDegrees(angle);
-                int redCara= (int) Math.max(0,Math.min(255,color.getRed()-angleDegrees*0.7));
-                int greenCara= (int) Math.max(0,Math.min(255,color.getGreen()-angleDegrees*0.7));
-                int blueCara= (int) Math.max(0,Math.min(255,color.getBlue()-angleDegrees*0.7));
+                int redCara = (int) Math.max(0, Math.min(255, color.getRed() - angleDegrees * 0.7));
+                int greenCara = (int) Math.max(0, Math.min(255, color.getGreen() - angleDegrees * 0.7));
+                int blueCara = (int) Math.max(0, Math.min(255, color.getBlue() - angleDegrees * 0.7));
 
-                color=new Color(redCara,greenCara,blueCara);
-                linea(puntosFinales[0].x,puntosFinales[0].y,puntosFinales[1].x,puntosFinales[1].y);
-                linea(puntosFinales[1].x,puntosFinales[1].y,puntosFinales[2].x,puntosFinales[2].y);
-                linea(puntosFinales[2].x,puntosFinales[2].y,puntosFinales[3].x,puntosFinales[3].y);
-                linea(puntosFinales[3].x,puntosFinales[3].y,puntosFinales[0].x,puntosFinales[0].y);
+                color = new Color(redCara, greenCara, blueCara);
+                linea(puntosFinales[0].x, puntosFinales[0].y, puntosFinales[1].x, puntosFinales[1].y);
+                linea(puntosFinales[1].x, puntosFinales[1].y, puntosFinales[2].x, puntosFinales[2].y);
+                linea(puntosFinales[2].x, puntosFinales[2].y, puntosFinales[3].x, puntosFinales[3].y);
+                linea(puntosFinales[3].x, puntosFinales[3].y, puntosFinales[0].x, puntosFinales[0].y);
 
 
-                Coordenada3DDouble centro=currentFace.calculateCenterPoint();
-                CoordenadaInt centro2d=proyectarPuntoUnPuntoFuga(centro);
+                Coordenada3DDouble centro = currentFace.calculateCenterPoint();
+                CoordenadaInt centro2d = proyectarPerspectiva(centro);
 
                 scanLineFill(centro2d.x, centro2d.y);
             }
 
-            color=colorGuardado;
+            color = colorGuardado;
         }
     }
 
+    private Coordenada3DDouble rotacion3D(Coordenada3DDouble origen) {
 
-    public void drawToBuffer(Image buffer,JFrame frame) {
-        buffer.getGraphics().drawImage(image,0,0,frame);
+        double[][] matrizOrigen = {{origen.x, origen.y, origen.z, 1}};
+        // Convert angles to radians
+        double radianX = vectorRotacion.x;
+        double radianY = vectorRotacion.y;
+        double radianZ = vectorRotacion.z;
+
+        // Create the rotation matrix
+        double[][] matrizTransformacion = {
+                {Math.cos(radianY) * Math.cos(radianZ), -Math.cos(radianX) * Math.sin(radianZ) + Math.sin(radianX) * Math.sin(radianY) * Math.cos(radianZ), Math.sin(radianX) * Math.sin(radianZ) + Math.cos(radianX) * Math.sin(radianY) * Math.cos(radianZ), 0},
+                {Math.cos(radianY) * Math.sin(radianZ), Math.cos(radianX) * Math.cos(radianZ) + Math.sin(radianX) * Math.sin(radianY) * Math.sin(radianZ), -Math.sin(radianX) * Math.cos(radianZ) + Math.cos(radianX) * Math.sin(radianY) * Math.sin(radianZ), 0},
+                {-Math.sin(radianY), Math.sin(radianX) * Math.cos(radianY), Math.cos(radianX) * Math.cos(radianY), 0},
+                {0, 0, 0, 1}
+        };
+
+        double[][] resultado = multiplicarMatriz4x4(matrizOrigen, matrizTransformacion);
+
+        return new Coordenada3DDouble(resultado[0][0], resultado[0][1], resultado[0][2]);
     }
+
+    private Coordenada3DDouble traslacion3D(Coordenada3DDouble origen) {
+
+        double[][] matrizOrigen = {{origen.x, origen.y, origen.z, 1}};
+        // Create the rotation matrix
+        double[][] matrizTransformacion = {
+                {1, 0, 0, 0},
+                {0, 1, 0, 0},
+                {0, 0, 1, 0},
+                {vectorTraslacion.x, vectorTraslacion.y, vectorTraslacion.z, 1}
+        };
+        double[][] resultado = multiplicarMatriz4x4(matrizOrigen, matrizTransformacion);
+
+        return new Coordenada3DDouble(resultado[0][0], resultado[0][1], resultado[0][2]);
+    }
+
+    private Coordenada3DDouble escalacion3D(Coordenada3DDouble origen) {
+
+        double[][] matrizOrigen = {{origen.x, origen.y, origen.z, 1}};
+        // Create the rotation matrix
+        double[][] matrizTransformacion = {
+                {vectorEscalacion.x, 0, 0, 0},
+                {0, vectorEscalacion.y, 0, 0},
+                {0, 0, vectorEscalacion.z, 0},
+                {0, 0, 0, 1}
+        };
+        double[][] resultado = multiplicarMatriz4x4(matrizOrigen, matrizTransformacion);
+
+        return new Coordenada3DDouble(resultado[0][0], resultado[0][1], resultado[0][2]);
+    }
+
+    private CoordenadaInt calcularTransformaciones(CoordenadaInt puntoOrigen) {
+        CoordenadaDouble punto = new CoordenadaDouble(puntoOrigen.x, puntoOrigen.y);
+        CoordenadaDouble puntoDestino = calcularTraslacion(calcularEscalacion(calularRotacion(punto)));
+        return new CoordenadaInt((int) puntoDestino.x, (int) puntoDestino.y);
+    }
+
+    private double[][] multiplicarMatriz(double[][] matrizOrigen, double[][] matrizTransformacion) {
+        double[][] resultado = new double[1][3];
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 3; j++) {
+                for (int k = 0; k < 3; k++) {
+                    resultado[i][j] += matrizOrigen[i][k] * matrizTransformacion[k][j];
+                }
+            }
+        }
+        return resultado;
+    }
+
+    private double[][] multiplicarMatriz4x4(double[][] matrizOrigen, double[][] matrizTransformacion) {
+        int filasOrigen = matrizOrigen.length;
+        int columnasOrigen = matrizOrigen[0].length;
+        int columnasTransformacion = matrizTransformacion[0].length;
+
+        double[][] resultado = new double[filasOrigen][columnasTransformacion];
+
+        for (int i = 0; i < filasOrigen; i++) {
+            for (int j = 0; j < columnasTransformacion; j++) {
+                for (int k = 0; k < columnasOrigen; k++) {
+                    resultado[i][j] += matrizOrigen[i][k] * matrizTransformacion[k][j];
+                }
+            }
+        }
+
+        return resultado;
+    }
+
+    private int[][] multiplicarMatriz(int[][] matrizOrigen, int[][] matrizTransformacion) {
+        int[][] resultado = new int[1][3];
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 3; j++) {
+                for (int k = 0; k < 3; k++) {
+                    resultado[i][j] += matrizOrigen[i][k] * matrizTransformacion[k][j];
+                }
+            }
+        }
+        return resultado;
+    }
+
+    public void traslacion(int dxNuevo, int dyNuevo) {
+        dx = dxNuevo;
+        dy = dyNuevo;
+    }
+
+    public void traslacionAnimacion(int dxNuevo, int dyNuevo) {
+        dxAnimacion = dxNuevo;
+        dyAnimacion = dyNuevo;
+    }
+
+    public void escalacion(double sxNuevo, double syNuevo) {
+        sx = sxNuevo;
+        sy = syNuevo;
+    }
+
+    public void escalacionAnimacion(double sxNuevo, double syNuevo) {
+        sxAnimacion = sxNuevo;
+        syAnimacion = syNuevo;
+    }
+
+    public void rotacion(double anguloNuevo) {
+        theta = anguloNuevo;
+    }
+
+    public void setVectorProyeccion(Coordenada3D vectorProyeccion) {
+        this.vectorProyeccion = vectorProyeccion;
+    }
+
+    public void setVectorRotacion(double x, double y, double z) {
+        this.vectorRotacion = new Coordenada3DDouble(x, y, z);
+    }
+
+    public void setVectorEscalacion(double x, double y, double z) {
+        this.vectorEscalacion = new Coordenada3DDouble(x, y, z);
+    }
+
+    public void setVectorTraslacion(double x, double y, double z) {
+        this.vectorTraslacion = new Coordenada3DDouble(x, y, z);
+    }
+
+    public void drawToBuffer(Image buffer, JFrame frame) {
+        buffer.getGraphics().drawImage(image, 0, 0, frame);
+    }
+
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
+
+    public void resetImage(JFrame ventana) {
+        this.image = new BufferedImage(ventana.getWidth(), ventana.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    }
+
 }
