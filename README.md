@@ -5,9 +5,9 @@ Estas funciones permiten crear y manipular elementos bidimensionales y tridimens
 # Ejemplos
 animaciones creadas con la libreria
 
-![image](https://github.com/KevinGrajeda/graficasJava/assets/60023139/c8100870-f2fc-41dc-9709-bd242a78722a)
+![image](https://github.com/KevinGrajeda/graficasJava/assets/60023139/570cfccb-a5b7-4bcc-a9f5-dcaabbb6a868)
 
-![image](https://github.com/KevinGrajeda/graficasJava/assets/60023139/5f35272e-ec59-4665-b1bf-cdc0834af0fc)
+![image](https://github.com/KevinGrajeda/graficasJava/assets/60023139/9155ad8a-4141-48f0-8221-bfb385e65183)
 
 # Funciones en la libreria
 ## Funciones 2D
