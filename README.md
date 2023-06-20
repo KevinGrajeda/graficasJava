@@ -1,5 +1,16 @@
+# Graficas Java
+Este repositorio contiene funciones gráficas implementadas en Java realizadas con fines educativos, diseñadas para proporcionar una amplia gama de capacidades de graficas por computadora 2D y 3D sin la necesidad de utilizar la librería Graphics.
+Estas funciones permiten crear y manipular elementos bidimensionales y tridimensionales, así como realizar animaciones.
+
+# Ejemplos
+animaciones creadas con la libreria
+
+![image](https://github.com/KevinGrajeda/graficasJava/assets/60023139/c8100870-f2fc-41dc-9709-bd242a78722a)
+
+![image](https://github.com/KevinGrajeda/graficasJava/assets/60023139/5f35272e-ec59-4665-b1bf-cdc0834af0fc)
+
 # Funciones en la libreria
-## 2D
+## Funciones 2D
 - putPixel
 - getPixel
 - lineaEcuacion
@@ -31,7 +42,7 @@
 - escalacion
 - rotacion
 
-## 3D
+## Funciones 3D
 - cuboParalelo
 - tetris
 - proyectarParalela
@@ -49,7 +60,7 @@
 - setVectorEscalacion
 - setVectorTraslacion
 
-## animacion
+## Funciones para animacion
 - traslacion
 - escalacion
 - rotacion
