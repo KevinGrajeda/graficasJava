@@ -383,7 +383,7 @@ public class Dibujar {
                 },
                 {
                         0,
-                        sy * (sxAnimacion + 1),
+                        sy * (syAnimacion + 1),
                         0
                 },
                 {
